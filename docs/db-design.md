@@ -4,13 +4,13 @@
 
 ※ Supabase Authを使用
 
-| カラム名  　| 型          | NULL | 説明                   　|
-| ---------- | ----------- | ---- | ------------------------|
-| id         | uuid        | NO   | 主キー（auth.users連携） |
-| name       | varchar(50) | NO   | ユーザー名             　|
-| avatar_url | text        | YES  | プロフィール画像        　|
-| created_at | timestamp   | NO   | 作成日時               　|
-| updated_at | timestamp   | NO   | 更新日時               　|
+| カラム名 　 | 型          | NULL | 説明 　                  |
+| ----------- | ----------- | ---- | ------------------------ |
+| id          | uuid        | NO   | 主キー（auth.users連携） |
+| name        | varchar(50) | NO   | ユーザー名 　            |
+| avatar_url  | text        | YES  | プロフィール画像 　      |
+| created_at  | timestamp   | NO   | 作成日時 　              |
+| updated_at  | timestamp   | NO   | 更新日時 　              |
 
 補足：
 
@@ -20,11 +20,11 @@
 
 ## teams
 
-| カラム名      | 型          | NULL | 説明                        　|
-| ------------ | ----------- | ---- | ---------------------------- |
-| id           | uuid        | NO   | 主キー（チーム/部屋）          |
+| カラム名     | 型          | NULL | 説明 　                       |
+| ------------ | ----------- | ---- | ----------------------------- |
+| id           | uuid        | NO   | 主キー（チーム/部屋）         |
 | project_name | varchar(80) | NO   | 部屋名                        |
-| members_num  | integer     | NO   | 所属人数（キャッシュ用途）    　|
+| members_num  | integer     | NO   | 所属人数（キャッシュ用途） 　 |
 | created_at   | timestamp   | NO   | 作成日時                      |
 
 ## 制約
@@ -40,11 +40,11 @@
 
 ## team_members
 
-| カラム名  | 型        | NULL | 説明        |
-| -------- | --------- | ---- | ----------- |
-| id       | uuid      | NO   | 主キー     　|
-| team_id  | uuid      | NO   | teams.id    |
-| user_id  | uuid      | NO   | users.id    |
+| カラム名 | 型   | NULL | 説明      |
+| -------- | ---- | ---- | --------- |
+| id       | uuid | NO   | 主キー 　 |
+| team_id  | uuid | NO   | teams.id  |
+| user_id  | uuid | NO   | users.id  |
 
 ## 制約
 
@@ -64,18 +64,18 @@
 
 ## daily_reports
 
-| カラム名     | 型          | NULL | 説明    　|
-| ----------- | ----------- | ---- | -------- |
-| id          | uuid        | NO   | 主キー  　|
-| team_id     | uuid        | NO   | teams.id |
-| user_id     | uuid        | NO   | users.id |
-| title       | varchar(50) | NO   | タイトル |
-| report_date | date        | NO   | 日報日付 |
-| category    | varchar(20) | NO   | カテゴリ |
-| visibility  | varchar(10) | NO   | 公開範囲 |
-| content     | text        | NO   | 本文     |
-| created_at  | timestamp   | NO   | 作成日時 |
-| updated_at  | timestamp   | NO   | 更新日時 |
+| カラム名    | 型          | NULL | 説明 　   |
+| ----------- | ----------- | ---- | --------- |
+| id          | uuid        | NO   | 主キー 　 |
+| team_id     | uuid        | NO   | teams.id  |
+| user_id     | uuid        | NO   | users.id  |
+| title       | varchar(50) | NO   | タイトル  |
+| report_date | date        | NO   | 日報日付  |
+| category    | varchar(20) | NO   | カテゴリ  |
+| visibility  | varchar(10) | NO   | 公開範囲  |
+| content     | text        | NO   | 本文      |
+| created_at  | timestamp   | NO   | 作成日時  |
+| updated_at  | timestamp   | NO   | 更新日時  |
 
 ## 制約
 
@@ -110,13 +110,13 @@ team_id：
 
 ## comments
 
-| カラム名    | 型        | NULL | 説明        　　 　|
-| ---------- | --------- | ---- | ----------------　|
-| id         | uuid      | NO   | 主キー       　　　|
-| report_id  | uuid      | NO   | daily_reports.id  |
-| user_id    | uuid      | NO   | users.id          |
-| content    | text      | NO   | コメント         　|
-| created_at | timestamp | NO   | 作成日時        　 |
+| カラム名   | 型        | NULL | 説明             |
+| ---------- | --------- | ---- | ---------------- |
+| id         | uuid      | NO   | 主キー           |
+| report_id  | uuid      | NO   | daily_reports.id |
+| user_id    | uuid      | NO   | users.id         |
+| content    | text      | NO   | コメント         |
+| created_at | timestamp | NO   | 作成日時         |
 
 ## 制約
 
