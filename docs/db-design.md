@@ -20,35 +20,44 @@
 
 ## teams
 
-| カラム名     | 型          | NULL | 説明 　                       |
-| ------------ | ----------- | ---- | ----------------------------- |
-| id           | uuid        | NO   | 主キー（チーム/部屋）         |
-| project_name | varchar(80) | NO   | 部屋名                        |
-| members_num  | integer     | NO   | 所属人数（キャッシュ用途） 　 |
-| created_at   | timestamp   | NO   | 作成日時                      |
+| カラム名     | 型          | NULL | 説明                       |
+| ------------ | ----------- | ---- | -------------------------- |
+| id           | uuid        | NO   | 主キー（チーム/部屋）     |
+| project_name | varchar(80) | NO   | 部屋名                     |
+| team_code    | varchar(20) | NO   | チーム参加コード           |
+| members_num  | integer     | NO   | 所属人数（キャッシュ用途） |
+| created_at   | timestamp   | NO   | 作成日時                   |
 
 ## 制約
 
 - project_name：
   - 80文字以内
 
+- team_code：
+  - UNIQUE（重複不可）
+  - 英数字のみ想定
+  - 20文字以内
+
 ## インデックス
 
 - project_name（部分一致検索をするなら別途検討）
+- team_code（チーム参加時検索用）
 
 ---
 
 ## team_members
 
-| カラム名 | 型   | NULL | 説明      |
-| -------- | ---- | ---- | --------- |
-| id       | uuid | NO   | 主キー 　 |
-| team_id  | uuid | NO   | teams.id  |
-| user_id  | uuid | NO   | users.id  |
+| カラム名  | 型        | NULL | 説明        |
+| --------- | --------- | ---- | ----------- |
+| id        | uuid      | NO   | 主キー      |
+| team_id   | uuid      | NO   | teams.id    |
+| user_id   | uuid      | NO   | users.id    |
+| joined_at | timestamp | NO   | 参加日時    |
 
 ## 制約
 
 - UNIQUE(team_id, user_id)
+（同じユーザーは同じチームに重複参加不可）
 
 ## 外部キー
 
@@ -59,6 +68,7 @@
 
 - team_id
 - user_id
+- (team_id, user_id)（複合インデックス）
 
 ---
 
@@ -132,6 +142,13 @@ content：
 ---
 
 # リレーション
+
+## users → teams
+
+1 user : many teams
+
+外部キー：
+teams.created_by
 
 ## teams → team_members
 
@@ -240,8 +257,11 @@ UPDATE / DELETE：
 SELECT：
 自分が所属する team のメンバーのみ
 
-INSERT / DELETE：
-招待・脱退の仕様に合わせて別途設計（現状はスコープ外）
+INSERT ：
+有効なteam_codeを入力し、認証済みユーザーのみ
+
+DELETE：
+脱退の仕様に合わせて別途設計（現状はスコープ外）
 
 ---
 
