@@ -82,7 +82,7 @@
 | title       | varchar(50) | NO   | タイトル  |
 | report_date | date        | NO   | 日報日付  |
 | category    | varchar(20) | NO   | カテゴリ  |
-| visibility  | varchar(10) | NO   | 公開範囲  |
+| visibility  | varchar(80) | NO   | 公開範囲  |
 | content     | text        | NO   | 本文      |
 | created_at  | timestamp   | NO   | 作成日時  |
 | updated_at  | timestamp   | NO   | 更新日時  |
@@ -105,7 +105,7 @@ visibility：
 
 - CHECK制約想定（team / global）
 - team：同一チーム（team_id）所属者のみ閲覧可能
-- global：全ログインユーザーが閲覧可能
+- global：全ログインユーザーが閲覧可能。これをデフォルト値とする。
 
 team_id：
 
