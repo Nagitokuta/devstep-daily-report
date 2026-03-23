@@ -10,15 +10,14 @@ export async function TeamMembers({ teamId }: { teamId: string }) {
 
   const members =
     rows?.map((r) => {
-      const u = r.users;
-      if (u && typeof u === "object" && "name" in u) {
-        return {
-          user_id: r.user_id as string,
-          name: u.name as string,
-          avatar_url: (u.avatar_url as string | null) ?? null,
-          joined_at: r.joined_at as string,
-        };
-      }
+      const user = r.users?.[0];
+
+      return {
+        user_id: r.user_id as string,
+        name: user?.name ?? "",
+        avatar_url: user?.avatar_url ?? null,
+        joined_at: r.joined_at as string,
+      };
       return null;
     }).filter((m): m is NonNullable<typeof m> => m != null) ?? [];
 
