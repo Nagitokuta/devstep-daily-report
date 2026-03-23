@@ -1,0 +1,210 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { REPORT_CATEGORIES, VISIBILITY_OPTIONS } from "@/lib/constants";
+import { createClient } from "@/lib/supabase/client";
+import { reportFormSchemaWithTeamContext } from "@/lib/validations/report";
+
+type ReportFormProps = {
+  teamId: string | null;
+  defaultReportDate: string;
+};
+
+export function ReportForm({ teamId, defaultReportDate }: ReportFormProps) {
+  const router = useRouter();
+  const [title, setTitle] = useState("");
+  const [reportDate, setReportDate] = useState(defaultReportDate);
+  const [category, setCategory] = useState<string>("development");
+  const [visibility, setVisibility] = useState<"team" | "global">("global");
+  const [content, setContent] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setErrors({});
+    const parsed = reportFormSchemaWithTeamContext(teamId).safeParse({
+      title,
+      report_date: reportDate,
+      category,
+      visibility,
+      content,
+    });
+    if (!parsed.success) {
+      const next: Record<string, string> = {};
+      parsed.error.issues.forEach((issue) => {
+        const p = issue.path[0];
+        if (typeof p === "string" && !next[p]) {
+          next[p] = issue.message;
+        }
+      });
+      setErrors(next);
+      return;
+    }
+
+    setLoading(true);
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    const { error } = await supabase.from("daily_reports").insert({
+      team_id: teamId,
+      user_id: user.id,
+      title: parsed.data.title.trim(),
+      report_date: parsed.data.report_date,
+      category: parsed.data.category,
+      visibility: parsed.data.visibility,
+      content: parsed.data.content,
+    });
+    setLoading(false);
+    if (error) {
+      setErrors({ form: error.message });
+      return;
+    }
+    router.replace("/reports");
+    router.refresh();
+  }
+
+  return (
+    <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
+      <div>
+        <label htmlFor="title" className="mb-1 block text-sm font-medium text-slate-700">
+          タイトル（50文字以内）
+        </label>
+        <input
+          id="title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          maxLength={50}
+          required
+          className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900"
+        />
+        {errors.title ? (
+          <p className="mt-1 text-sm text-red-600">{errors.title}</p>
+        ) : null}
+      </div>
+
+      <div>
+        <label htmlFor="report_date" className="mb-1 block text-sm font-medium text-slate-700">
+          日付
+        </label>
+        <input
+          id="report_date"
+          type="date"
+          value={reportDate}
+          onChange={(e) => setReportDate(e.target.value)}
+          required
+          className="w-full max-w-xs cursor-pointer rounded border border-slate-300 px-3 py-2 text-slate-900"
+        />
+        {errors.report_date ? (
+          <p className="mt-1 text-sm text-red-600">{errors.report_date}</p>
+        ) : null}
+      </div>
+
+      <div>
+        <span className="mb-1 block text-sm font-medium text-slate-700">カテゴリ</span>
+        <div className="flex flex-wrap gap-3">
+          {REPORT_CATEGORIES.map((c) => (
+            <label key={c.value} className="flex items-center gap-2 text-sm">
+              <input
+                type="radio"
+                name="category"
+                className="cursor-pointer"
+                value={c.value}
+                checked={category === c.value}
+                onChange={() => setCategory(c.value)}
+              />
+              {c.label}
+            </label>
+          ))}
+        </div>
+        {errors.category ? (
+          <p className="mt-1 text-sm text-red-600">{errors.category}</p>
+        ) : null}
+      </div>
+
+      <div>
+        <span className="mb-1 block text-sm font-medium text-slate-700">公開範囲</span>
+        <div className="flex flex-wrap gap-3">
+          {VISIBILITY_OPTIONS.map((v) => (
+            <label key={v.value} className="flex items-center gap-2 text-sm">
+              <input
+                type="radio"
+                name="visibility"
+                className="cursor-pointer"
+                value={v.value}
+                checked={visibility === v.value}
+                onChange={() => setVisibility(v.value)}
+                disabled={v.value === "team" && !teamId}
+              />
+              {v.label}
+              {v.value === "team" && !teamId ? (
+                <span className="text-xs text-slate-500">（要チーム参加）</span>
+              ) : null}
+            </label>
+          ))}
+        </div>
+        {!teamId ? (
+          <p className="mt-2 text-xs text-slate-500">
+            チーム未参加のときは「全体公開」のみ保存できます。「チーム内のみ」は
+            <Link href="/team" className="underline">
+              チーム画面
+            </Link>
+            から参加後に選択できます。
+          </p>
+        ) : null}
+        {errors.visibility ? (
+          <p className="mt-1 text-sm text-red-600">{errors.visibility}</p>
+        ) : null}
+      </div>
+
+      <div>
+        <label htmlFor="content" className="mb-1 block text-sm font-medium text-slate-700">
+          本文（2000文字以内）
+        </label>
+        <textarea
+          id="content"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          rows={12}
+          required
+          maxLength={2000}
+          className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900"
+        />
+        <p className="mt-1 text-xs text-slate-500">{content.length} / 2000</p>
+        {errors.content ? (
+          <p className="mt-1 text-sm text-red-600">{errors.content}</p>
+        ) : null}
+      </div>
+
+      {errors.form ? (
+        <p className="text-sm text-red-600" role="alert">
+          {errors.form}
+        </p>
+      ) : null}
+
+      <div className="flex flex-wrap gap-3">
+        <button
+          type="submit"
+          disabled={loading}
+          className="rounded bg-slate-900 cursor-pointer px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+        >
+          {loading ? "保存中…" : "保存する"}
+        </button>
+        <Link
+          href="/reports"
+          className="rounded border border-slate-300 cursor-pointer px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50"
+        >
+          キャンセル
+        </Link>
+      </div>
+    </form>
+  );
+}
