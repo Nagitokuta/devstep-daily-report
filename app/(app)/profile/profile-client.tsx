@@ -81,10 +81,10 @@ export function ProfileClient() {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
-
+  
     setError(null);
     setMessage(null);
-
+  
     if (!file.type.startsWith("image/")) {
       setError("画像ファイル（JPEG / PNG / WebP / GIF）を選んでください。");
       return;
@@ -93,48 +93,47 @@ export function ProfileClient() {
       setError("ファイルサイズは5MB以下にしてください。");
       return;
     }
-
+  
     setUploading(true);
     const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       setUploading(false);
       return;
     }
-
+  
+    // ファイル名は固定して上書き
     const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase();
     const safeExt = ["jpg", "jpeg", "png", "webp", "gif"].includes(ext) ? ext : "jpg";
     const path = `${user.id}/avatar.${safeExt}`;
-
+  
     const { error: upErr } = await supabase.storage.from(AVATAR_BUCKET).upload(path, file, {
       upsert: true,
       contentType: file.type || "image/jpeg",
     });
-
+  
     if (upErr) {
       setUploading(false);
       setError(upErr.message);
       return;
     }
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(path);
-
+  
+    // キャッシュ回避用にクエリパラメータ ?t=timestamp を付与
+    const { data: { publicUrl } } = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(path);
+    const cacheBustedUrl = `${publicUrl}?t=${Date.now()}`;
+  
     const { error: dbErr } = await supabase
       .from("users")
-      .update({ avatar_url: publicUrl })
+      .update({ avatar_url: cacheBustedUrl })
       .eq("id", user.id);
-
+  
     setUploading(false);
     if (dbErr) {
       setError(dbErr.message);
       return;
     }
-
-    setAvatarUrl(publicUrl);
+  
+    setAvatarUrl(cacheBustedUrl);
     setMessage("プロフィール画像を更新しました。");
     notifyProfileUpdated();
   }
