@@ -1,8 +1,31 @@
-// app/api/auth/middlewareNode.ts
-import { NextRequest, NextResponse } from "next/server";
+// app/api/auth/route.ts
 import { createServerClient } from "@supabase/ssr";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function handler(req: NextRequest) {
+// 公開ページのパス
+const publicPaths = new Set([
+  "/",
+  "/login",
+  "/signup",
+  "/reset-password",
+]);
+
+function isPublicPath(pathname: string) {
+  if (publicPaths.has(pathname)) return true;
+  if (pathname.startsWith("/auth/")) return true;
+  return false;
+}
+
+function isProtectedPath(pathname: string) {
+  return (
+    pathname.startsWith("/reports") ||
+    pathname.startsWith("/profile") ||
+    pathname.startsWith("/team")
+  );
+}
+
+// Node.js runtime 用 API route
+export async function GET(req: NextRequest) {
   const response = NextResponse.next();
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -13,6 +36,7 @@ export async function handler(req: NextRequest) {
   }
 
   try {
+    // Node.js runtime 安全版 Supabase client
     const supabase = createServerClient(supabaseUrl, supabaseKey, {
       cookies: {
         getAll() {
@@ -32,9 +56,7 @@ export async function handler(req: NextRequest) {
     const pathname = req.nextUrl.pathname;
 
     // protected route に未ログインなら login にリダイレクト
-    if ((pathname.startsWith("/reports") ||
-         pathname.startsWith("/profile") ||
-         pathname.startsWith("/team")) && !user) {
+    if (isProtectedPath(pathname) && !user) {
       const login = new URL("/login", req.url);
       login.searchParams.set("next", pathname);
       return NextResponse.redirect(login);
@@ -47,7 +69,7 @@ export async function handler(req: NextRequest) {
 
     return response;
   } catch (err) {
-    console.error("Node middleware error:", err);
+    console.error("Node.js auth route error:", err);
     return response;
   }
 }
