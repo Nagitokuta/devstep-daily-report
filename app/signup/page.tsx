@@ -19,8 +19,10 @@ export default function SignupPage() {
     setError(null);
     setMessage(null);
     setLoading(true);
+  
     const supabase = createClient();
     const origin = typeof window !== "undefined" ? window.location.origin : "";
+  
     const { data, error: signError } = await supabase.auth.signUp({
       email,
       password,
@@ -29,18 +31,22 @@ export default function SignupPage() {
         data: { name: name.trim() },
       },
     });
+  
     setLoading(false);
+  
     if (signError) {
-      setError(signError.message);
+      setError("メールアドレスはすでに使われているか、入力に誤りがあります。");
       return;
     }
+  
     if (data.session) {
       router.replace("/team");
       router.refresh();
       return;
     }
+  
     setMessage(
-      "確認メールを送信しました。メール内のリンクを開いて登録を完了してください。",
+      "確認メールを送信しました。メール内のリンクを開いて登録を完了してください。"
     );
   }
 

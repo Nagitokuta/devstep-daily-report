@@ -18,16 +18,20 @@ export function LoginForm() {
     e.preventDefault();
     setError(null);
     setLoading(true);
+  
     const supabase = createClient();
     const { error: signError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+  
     setLoading(false);
+  
     if (signError) {
-      setError(signError.message);
+      setError("メールアドレスかパスワードが違います。");
       return;
     }
+  
     router.replace(next);
     router.refresh();
   }
