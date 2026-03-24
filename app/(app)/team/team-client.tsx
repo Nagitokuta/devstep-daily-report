@@ -23,6 +23,8 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
   const [joinCode, setJoinCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
 
   async function onTeamChange(teamId: string) {
     await setSelectedTeamId(teamId);
@@ -32,45 +34,132 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+  
+    const name = createName.trim();
+    if (!name) {
+      setError("チーム名を入力してください。");
+      return;
+    }
+  
     setLoading("create");
     const supabase = createClient();
+  
+    // 同名チームが存在するかチェック
+    const { data: existingTeams, error: checkError } = await supabase
+      .from("teams")
+      .select("id")
+      .ilike("project_name", name); // ilike で大文字小文字無視
+  
+    if (checkError) {
+      setError("チーム名チェック中にエラーが発生しました。");
+      setLoading(null);
+      return;
+    }
+  
+    if (existingTeams && existingTeams.length > 0) {
+      setError("同じ名前のチームがすでに存在します。別の名前を入力してください。");
+      setLoading(null);
+      return;
+    }
+  
+    // 正常作成
     const { data, error: rpcError } = await supabase.rpc("create_team", {
-      p_name: createName.trim(),
+      p_name: name,
     });
     setLoading(null);
+  
     if (rpcError) {
       setError(rpcError.message);
       return;
     }
+  
     if (data) {
       await setSelectedTeamId(data as string);
       setCreateName("");
       router.refresh();
+  
+      setModalMessage("チームを作成しました！🎉");
+      setShowModal(true);
     }
   }
 
   async function handleJoin(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setLoading("join");
-    const supabase = createClient();
-    const { data, error: rpcError } = await supabase.rpc("join_team", {
-      p_code: joinCode.trim().toUpperCase(),
-    });
-    setLoading(null);
-    if (rpcError) {
-      setError(rpcError.message);
+    if (!joinCode.trim()) {
+      setError("参加コードを入力してください。");
       return;
     }
-    if (data) {
-      await setSelectedTeamId(data as string);
+
+    setLoading("join");
+    const supabase = createClient();
+    const code = joinCode.trim().toUpperCase();
+
+    try {
+      // チーム存在確認
+      const { data: team, error: teamError } = await supabase
+        .from("teams")
+        .select("id")
+        .eq("team_code", code)
+        .single();
+
+      if (teamError || !team) {
+        setError("参加コードが存在しません。");
+        setLoading(null);
+        return;
+      }
+
+      // ユーザー UID 取得
+      const { data: authData, error: authError } = await supabase.auth.getUser();
+      if (authError || !authData.user) {
+        setError("ユーザー情報の取得に失敗しました。");
+        setLoading(null);
+        return;
+      }
+      const uid = authData.user.id;
+
+      // すでに参加済みか確認
+      const { data: existing } = await supabase
+        .from("team_members")
+        .select("user_id")
+        .eq("team_id", team.id)
+        .eq("user_id", uid)
+        .single();
+
+      if (existing) {
+        setError("すでにこのチームに参加済みです。");
+        setLoading(null);
+        return;
+      }
+
+      // 正常参加
+      const { error: joinError } = await supabase.from("team_members").insert({
+        team_id: team.id,
+        user_id: uid,
+      });
+
+      setLoading(null);
+      if (joinError) {
+        setError(joinError.message);
+        return;
+      }
+
       setJoinCode("");
+      await setSelectedTeamId(team.id);
       router.refresh();
+
+      // 参加モーダルを表示
+      setModalMessage("チームに参加しました！🎉");
+      setShowModal(true);
+    } catch (err: any) {
+      setError(err.message || "エラーが発生しました。");
+      setLoading(null);
     }
   }
 
   return (
     <div className="space-y-10">
+      {/* 現在のチーム */}
       <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-slate-900">現在のチーム</h2>
         {teams.length === 0 ? (
@@ -98,7 +187,9 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
         )}
       </section>
 
+      {/* 作成・参加フォーム */}
       <div className="grid gap-8 md:grid-cols-2">
+        {/* チーム作成 */}
         <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-slate-900">チームを作成</h2>
           <form onSubmit={(e) => void handleCreate(e)} className="mt-4 space-y-3">
@@ -126,6 +217,7 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
           </form>
         </section>
 
+        {/* 参加コードで参加 */}
         <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-slate-900">参加コードで参加</h2>
           <form onSubmit={(e) => void handleJoin(e)} className="mt-4 space-y-3">
@@ -153,11 +245,29 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
         </section>
       </div>
 
-      {error ? (
+      {/* エラー表示 */}
+      {error && (
         <p className="text-sm text-red-600" role="alert">
           {error}
         </p>
-      ) : null}
+      )}
+
+      {/* モーダル */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="rounded-lg bg-white p-6 shadow-lg">
+            <p className="mb-4 text-center text-lg font-medium text-slate-900">
+              {modalMessage}
+            </p>
+            <button
+              onClick={() => setShowModal(false)}
+              className="mx-auto block rounded bg-slate-900 px-4 py-2 cursor-pointer text-white hover:bg-slate-800"
+            >
+              閉じる
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
