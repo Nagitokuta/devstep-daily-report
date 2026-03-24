@@ -1,25 +1,64 @@
-import { createClient } from "@/lib/supabase/server";
+"use client";
 
-export async function TeamMembers({ teamId }: { teamId: string }) {
-  const supabase = await createClient();
-  const { data: rows } = await supabase
-    .from("team_members")
-    .select("user_id, joined_at, users ( name, avatar_url )")
-    .eq("team_id", teamId)
-    .order("joined_at", { ascending: true });
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
-  const members =
-    rows?.map((r) => {
-      const user = r.users?.[0];
+type Member = {
+  user_id: string;
+  name: string;
+  avatar_url: string | null;
+  joined_at: string;
+};
 
-      return {
-        user_id: r.user_id as string,
-        name: user?.name ?? "",
-        avatar_url: user?.avatar_url ?? null,
-        joined_at: r.joined_at as string,
-      };
-      return null;
-    }).filter((m): m is NonNullable<typeof m> => m != null) ?? [];
+export function TeamMembers({ teamId }: { teamId: string }) {
+  const [members, setMembers] = useState<Member[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchMembers() {
+      setLoading(true);
+      const supabase = createClient();
+
+      const { data: rows, error } = await supabase
+        .from("team_members")
+        .select(`
+          user_id,
+          joined_at,
+          users (
+            id,
+            name,
+            avatar_url
+          )
+        `)
+        .eq("team_id", teamId)
+        .order("joined_at", { ascending: true });
+
+      if (error) {
+        setError("メンバー情報の取得に失敗しました");
+        console.error(error);
+      } else {
+        const members: Member[] =
+          rows?.map((r) => {
+            const user = r.users as any;
+            const firstUser = Array.isArray(user) ? user[0] : user;
+            return {
+              user_id: r.user_id,
+              name: firstUser?.name ?? "名無し",
+              avatar_url: firstUser?.avatar_url ?? null,
+              joined_at: r.joined_at,
+            };
+          }) ?? [];
+        setMembers(members);
+      }
+      setLoading(false);
+    }
+
+    fetchMembers();
+  }, [teamId]);
+
+  if (loading) return <p>読み込み中…</p>;
+  if (error) return <p className="text-red-600">{error}</p>;
 
   return (
     <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
@@ -28,10 +67,9 @@ export async function TeamMembers({ teamId }: { teamId: string }) {
         {members.map((m) => (
           <li key={m.user_id} className="flex items-center gap-3 py-3">
             {m.avatar_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={m.avatar_url}
-                alt=""
+                alt={m.name}
                 className="h-10 w-10 rounded-full object-cover"
               />
             ) : (
