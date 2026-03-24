@@ -102,7 +102,7 @@ export function ReportEditForm({ reportId, initial }: ReportEditFormProps) {
           value={reportDate}
           onChange={(e) => setReportDate(e.target.value)}
           required
-          className="w-full max-w-xs rounded border border-slate-300 px-3 py-2 text-slate-900"
+          className="w-full max-w-xs cursor-pointer rounded border border-slate-300 px-3 py-2 text-slate-900"
         />
         {errors.report_date ? (
           <p className="mt-1 text-sm text-red-600">{errors.report_date}</p>
@@ -117,6 +117,7 @@ export function ReportEditForm({ reportId, initial }: ReportEditFormProps) {
               <input
                 type="radio"
                 name="category"
+                className="cursor-pointer"
                 value={c.value}
                 checked={category === c.value}
                 onChange={() => setCategory(c.value)}
@@ -138,6 +139,7 @@ export function ReportEditForm({ reportId, initial }: ReportEditFormProps) {
               <input
                 type="radio"
                 name="visibility"
+                className="cursor-pointer"
                 value={v.value}
                 checked={visibility === v.value}
                 onChange={() => setVisibility(v.value)}
@@ -180,7 +182,7 @@ export function ReportEditForm({ reportId, initial }: ReportEditFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+          className="rounded bg-slate-900 cursor-pointer px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
         >
           {loading ? "保存中…" : "更新する"}
         </button>
