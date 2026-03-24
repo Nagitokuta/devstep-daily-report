@@ -33,7 +33,7 @@ export function LoginForm() {
   }
 
   return (
-    <div className="mx-auto flex min-h-full max-w-md flex-col justify-center px-4 py-16">
+    <div className="mx-auto flex min-h-full w-full max-w-md md:w-1/2 flex-col justify-center px-4 py-16">
       <h1 className="mb-6 text-center text-2xl font-semibold text-slate-900">
         ログイン
       </h1>
@@ -83,7 +83,7 @@ export function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded bg-slate-900 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+          className="w-full rounded bg-slate-900 cursor-pointer py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
         >
           {loading ? "送信中…" : "ログイン"}
         </button>

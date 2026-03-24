@@ -97,7 +97,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
           <button
             type="button"
             onClick={() => void handleSignOut()}
-            className="text-lg text-slate-700 hover:text-slate-900"
+            className="text-lg text-slate-700 cursor-pointer hover:text-slate-900"
           >
             ログアウト
           </button>

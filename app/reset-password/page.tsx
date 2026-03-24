@@ -64,7 +64,7 @@ export default function ResetPasswordPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded bg-slate-900 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+          className="w-full rounded bg-slate-900 cursor-pointer py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
         >
           {loading ? "送信中…" : "メールを送信"}
         </button>
