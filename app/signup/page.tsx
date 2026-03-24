@@ -32,15 +32,14 @@ export default function SignupPage() {
       },
     });
   
-    setLoading(false);
-  
     if (signError) {
       setError("メールアドレスはすでに使われているか、入力に誤りがあります。");
+      setLoading(false); 
       return;
     }
   
     if (data.session) {
-      router.replace("/team");
+      await router.replace("/team");
       router.refresh();
       return;
     }
@@ -48,6 +47,7 @@ export default function SignupPage() {
     setMessage(
       "確認メールを送信しました。メール内のリンクを開いて登録を完了してください。"
     );
+    setLoading(false);
   }
 
   return (

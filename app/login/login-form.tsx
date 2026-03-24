@@ -25,14 +25,12 @@ export function LoginForm() {
       password,
     });
   
-    setLoading(false);
-  
     if (signError) {
       setError("メールアドレスかパスワードが違います。");
+      setLoading(false);
       return;
     }
-  
-    router.replace(next);
+    await router.replace(next);
     router.refresh();
   }
 

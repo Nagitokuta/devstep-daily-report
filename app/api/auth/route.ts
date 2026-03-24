@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Node.js runtime 安全版 Supabase client
+    
     const supabase = createServerClient(supabaseUrl, supabaseKey, {
       cookies: {
         getAll() {
