@@ -124,7 +124,7 @@ export function CommentSection({
               <button
                 type="button"
                 onClick={() => void handleDelete(c.id)}
-                className="mt-2 text-xs text-red-600 hover:underline"
+                className="mt-2 text-xs cursor-pointer text-red-600 hover:underline"
               >
                 削除
               </button>
@@ -153,7 +153,7 @@ export function CommentSection({
         <button
           type="submit"
           disabled={loading}
-          className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+          className="rounded bg-slate-900 cursor-pointer px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
         >
           {loading ? "送信中…" : "投稿する"}
         </button>
