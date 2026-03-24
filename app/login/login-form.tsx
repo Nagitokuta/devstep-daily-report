@@ -27,6 +27,7 @@ export function LoginForm() {
   
     if (signError) {
       setError("メールアドレスかパスワードが違います。");
+      setPassword("");
       setLoading(false);
       return;
     }

@@ -31,10 +31,12 @@ export default function SignupPage() {
         data: { name: name.trim() },
       },
     });
-  
+
     if (signError) {
       setError("メールアドレスはすでに使われているか、入力に誤りがあります。");
-      setLoading(false); 
+      setPassword("");
+      document.getElementById("password")?.focus();
+      setLoading(false);
       return;
     }
   
@@ -45,8 +47,13 @@ export default function SignupPage() {
     }
   
     setMessage(
-      "確認メールを送信しました。メール内のリンクを開いて登録を完了してください。"
+      "確認メールを送信しました。メール内のリンクを開いて登録を完了してください。（登録済みの場合も確認メールが送信されます）"
     );
+
+    setName("");
+    setEmail("");
+    setPassword("");
+  
     setLoading(false);
   }
 
