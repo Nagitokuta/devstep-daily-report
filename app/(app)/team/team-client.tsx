@@ -108,7 +108,7 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
       const { data: team, error: teamError } = await supabase
         .from("teams")
         .select("id")
-        .eq("team_code", code)
+        .ilike("team_code", code)
         .single();
 
       if (teamError || !team) {
