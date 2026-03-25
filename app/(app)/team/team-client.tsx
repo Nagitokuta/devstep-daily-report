@@ -17,6 +17,14 @@ type TeamClientProps = {
   selectedTeamId: string | null;
 };
 
+function normalizeText(text: string) {
+  return text
+    .trim()
+    .normalize("NFKC")
+    .slice(0,80)
+    .replace(/\s+/g," ");
+}
+
 export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
   const router = useRouter();
   const [createName, setCreateName] = useState("");
@@ -36,7 +44,7 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
     e.preventDefault();
     setError(null);
   
-    const name = createName.trim();
+    const name = normalizeText(createName);
     if (!name) {
       setError("チーム名を入力してください");
       setErrorType("create");
@@ -48,9 +56,9 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
   
     // 同名チームが存在するかチェック
     const { data: existingTeams, error: checkError } = await supabase
-      .from("teams")
-      .select("id")
-      .ilike("project_name", name); // ilike で大文字小文字無視
+    .from("teams")
+    .select("id")
+    .eq("project_name", name);
   
     if (checkError) {
       setError("チーム名チェック中にエラーが発生しました。");
@@ -82,6 +90,9 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
       await setSelectedTeamId(data as string);
       setCreateName("");
       router.refresh();
+
+      setError(null);
+      setErrorType(null);
   
       setModalMessage("チームを作成しました！🎉");
       setShowModal(true);
@@ -99,16 +110,18 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
 
     setLoading("join");
     const supabase = createClient();
-    const code = joinCode.trim().toUpperCase();
+    const code = joinCode
+      .trim()
+      .normalize("NFKC")
+      .replace(/[^A-Z0-9]/gi,"")
+      .toUpperCase();
 
     try {
-      const code = joinCode.trim().toUpperCase();
-
       // チーム存在確認
       const { data: team, error: teamError } = await supabase
         .from("teams")
         .select("id")
-        .ilike("team_code", code)
+        .eq("team_code", code)
         .single();
 
       if (teamError || !team) {
@@ -158,6 +171,9 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
       setJoinCode("");
       await setSelectedTeamId(team.id);
       router.refresh();
+
+      setError(null);
+      setErrorType(null);
 
       // 参加モーダルを表示
       setModalMessage("チームに参加しました！🎉");
@@ -226,7 +242,9 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
               <input
                 id="create-name"
                 value={createName}
-                onChange={(e) => setCreateName(e.target.value)}
+                onChange={(e) =>
+                  setCreateName(e.target.value.normalize("NFKC"))
+                }
                 maxLength={80}
                 className={`w-full rounded border px-3 py-2 text-slate-900 ${
                   errorType === "create"
@@ -275,7 +293,12 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
                 id="join-code"
                 value={joinCode}
                 onChange={(e) =>
-                  setJoinCode(e.target.value.replace(/\s/g, "").toUpperCase())
+                  setJoinCode(
+                    e.target.value
+                      .normalize("NFKC")
+                      .replace(/\s/g,"")
+                      .toUpperCase()
+                  )
                 }
                 maxLength={20}
                 className={`w-full rounded border px-3 py-2 font-mono text-slate-900 uppercase ${
