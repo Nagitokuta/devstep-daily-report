@@ -25,6 +25,7 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
+  const [errorType, setErrorType] = useState<"create" | "join" | null>(null);
 
   async function onTeamChange(teamId: string) {
     await setSelectedTeamId(teamId);
@@ -37,7 +38,8 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
   
     const name = createName.trim();
     if (!name) {
-      setError("チーム名を入力してください。");
+      setError("チーム名を入力してください");
+      setErrorType("create");
       return;
     }
   
@@ -52,12 +54,14 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
   
     if (checkError) {
       setError("チーム名チェック中にエラーが発生しました。");
+      setErrorType("create");
       setLoading(null);
       return;
     }
   
     if (existingTeams && existingTeams.length > 0) {
       setError("同じ名前のチームがすでに存在します。別の名前を入力してください。");
+      setErrorType("create");
       setLoading(null);
       return;
     }
@@ -70,6 +74,7 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
   
     if (rpcError) {
       setError(rpcError.message);
+      setErrorType("create");
       return;
     }
   
@@ -88,6 +93,7 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
     setError(null);
     if (!joinCode.trim()) {
       setError("参加コードを入力してください。");
+      setErrorType("join");
       return;
     }
 
@@ -105,6 +111,7 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
 
       if (teamError || !team) {
         setError("参加コードが存在しません。");
+        setErrorType("join");
         setLoading(null);
         return;
       }
@@ -113,6 +120,7 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
       const { data: authData, error: authError } = await supabase.auth.getUser();
       if (authError || !authData.user) {
         setError("ユーザー情報の取得に失敗しました。");
+        setErrorType("join");
         setLoading(null);
         return;
       }
@@ -128,6 +136,7 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
 
       if (existing) {
         setError("すでにこのチームに参加済みです。");
+        setErrorType("join");
         setLoading(null);
         return;
       }
@@ -189,24 +198,52 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
 
       {/* 作成・参加フォーム */}
       <div className="grid gap-8 md:grid-cols-2">
+
         {/* チーム作成 */}
-        <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900">チームを作成</h2>
+        <section className={`rounded-lg border bg-white p-6 shadow-sm ${
+          errorType === "create" ? "border-red-500" : "border-slate-200"
+        }`}>
+          <h2 className="text-lg font-semibold text-slate-900">
+            チームを作成
+          </h2>
+
           <form onSubmit={(e) => void handleCreate(e)} className="mt-4 space-y-3">
+
             <div>
-              <label htmlFor="create-name" className="mb-1 block text-sm text-slate-700">
+              <label 
+                htmlFor="create-name" 
+                className={`mb-1 block text-sm ${
+                  errorType === "create"
+                    ? "text-red-600"
+                    : "text-slate-700"
+                }`}
+              >
                 チーム名
               </label>
+
               <input
                 id="create-name"
                 value={createName}
                 onChange={(e) => setCreateName(e.target.value)}
                 maxLength={80}
-                required
-                className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900"
+                className={`w-full rounded border px-3 py-2 text-slate-900 ${
+                  errorType === "create"
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-200"
+                    : "border-slate-300"
+                }`}
                 placeholder="例: 開発チームA"
               />
+
+              <p className={`mt-1 text-xs ${
+                errorType === "create"
+                  ? "text-red-600"
+                  : "text-slate-500"
+              }`}>
+                最大80文字
+              </p>
+
             </div>
+
             <button
               type="submit"
               disabled={loading === "create"}
@@ -214,26 +251,56 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
             >
               {loading === "create" ? "作成中…" : "チームを作成"}
             </button>
+
           </form>
         </section>
+       {/* 参加コード */}
+        <section className={`rounded-lg border bg-white p-6 shadow-sm ${
+          errorType === "join" ? "border-red-500" : "border-slate-200"
+        }`}>
 
-        {/* 参加コードで参加 */}
-        <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900">参加コードで参加</h2>
+          <h2 className="text-lg font-semibold text-slate-900">
+            参加コードで参加
+          </h2>
+
           <form onSubmit={(e) => void handleJoin(e)} className="mt-4 space-y-3">
+
             <div>
-              <label htmlFor="join-code" className="mb-1 block text-sm text-slate-700">
+
+              <label 
+                htmlFor="join-code" 
+                className={`mb-1 block text-sm ${
+                  errorType === "join"
+                    ? "text-red-600"
+                    : "text-slate-700"
+                }`}
+              >
                 参加コード
               </label>
+
               <input
                 id="join-code"
                 value={joinCode}
                 onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                 maxLength={20}
-                className="w-full rounded border border-slate-300 px-3 py-2 font-mono text-slate-900 uppercase"
+                className={`w-full rounded border px-3 py-2 font-mono text-slate-900 uppercase ${
+                  errorType === "join"
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-slate-300"
+                }`}
                 placeholder="例: AB12CD34"
               />
+
+              <p className={`mt-1 text-xs ${
+                errorType === "join"
+                  ? "text-red-600"
+                  : "text-slate-500"
+              }`}>
+                チーム管理者から共有されたコードを入力してください
+              </p>
+
             </div>
+
             <button
               type="submit"
               disabled={loading === "join"}
@@ -241,6 +308,7 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
             >
               {loading === "join" ? "参加中…" : "チームに参加"}
             </button>
+
           </form>
         </section>
       </div>
