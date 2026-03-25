@@ -102,6 +102,8 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
     const code = joinCode.trim().toUpperCase();
 
     try {
+      const code = joinCode.trim().toUpperCase();
+
       // チーム存在確認
       const { data: team, error: teamError } = await supabase
         .from("teams")
@@ -233,15 +235,6 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
                 }`}
                 placeholder="例: 開発チームA"
               />
-
-              <p className={`mt-1 text-xs ${
-                errorType === "create"
-                  ? "text-red-600"
-                  : "text-slate-500"
-              }`}>
-                最大80文字
-              </p>
-
             </div>
 
             <button
@@ -281,7 +274,9 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
               <input
                 id="join-code"
                 value={joinCode}
-                onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                onChange={(e) =>
+                  setJoinCode(e.target.value.replace(/\s/g, "").toUpperCase())
+                }
                 maxLength={20}
                 className={`w-full rounded border px-3 py-2 font-mono text-slate-900 uppercase ${
                   errorType === "join"
@@ -290,14 +285,6 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
                 }`}
                 placeholder="例: AB12CD34"
               />
-
-              <p className={`mt-1 text-xs ${
-                errorType === "join"
-                  ? "text-red-600"
-                  : "text-slate-500"
-              }`}>
-                チーム管理者から共有されたコードを入力してください
-              </p>
 
             </div>
 
