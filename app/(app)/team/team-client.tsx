@@ -242,9 +242,7 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
               <input
                 id="create-name"
                 value={createName}
-                onChange={(e) =>
-                  setCreateName(e.target.value.normalize("NFKC"))
-                }
+                onChange={(e) => setCreateName(e.target.value)}
                 maxLength={80}
                 className={`w-full rounded border px-3 py-2 text-slate-900 ${
                   errorType === "create"
@@ -295,7 +293,6 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
                 onChange={(e) =>
                   setJoinCode(
                     e.target.value
-                      .normalize("NFKC")
                       .replace(/\s/g,"")
                       .toUpperCase()
                   )
