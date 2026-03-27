@@ -9,6 +9,12 @@ type PageProps = {
   params: Promise<{ id: string }>;
 };
 
+export function formatDate(date: string) {
+  return new Date(date).toLocaleString("ja-JP", {
+    timeZone: "Asia/Tokyo"
+  });
+}
+
 export default async function ReportDetailPage({ params }: PageProps) {
   const { id } = await params;
   const supabase = await createClient();
@@ -102,8 +108,8 @@ export default async function ReportDetailPage({ params }: PageProps) {
               {visibilityLabel(report.visibility)}
             </p>
             <p className="text-xs text-slate-500">
-              作成 {new Date(report.created_at).toLocaleString("ja-JP")} / 更新{" "}
-              {new Date(report.updated_at).toLocaleString("ja-JP")}
+              作成 {formatDate(report.created_at)} / 更新{" "}
+              {formatDate(report.updated_at)}
             </p>
           </div>
         </div>
