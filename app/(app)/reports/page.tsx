@@ -42,6 +42,12 @@ function normalizeSearchTerm(value: string): string {
   return value.replace(/[%_,]/g, " ").trim();
 }
 
+export function formatDate(date: string) {
+  return new Date(date).toLocaleString("ja-JP", {
+    timeZone: "Asia/Tokyo"
+  });
+}
+
 export default async function ReportsPage({
   searchParams,
 }: {
@@ -138,7 +144,7 @@ export default async function ReportsPage({
                     dateTime={r.created_at}
                     className="text-xs text-slate-500"
                   >
-                    {new Date(r.created_at).toLocaleString("ja-JP")}
+                    {formatDate(r.created_at)}
                   </time>
                 </div>
                 <p className="mt-1 text-sm text-slate-600">
