@@ -46,10 +46,15 @@ export default async function EditReportPage({ params }: PageProps) {
   return (
     <div className="space-y-6">
       <div>
-        <Link href={`/reports/${id}`} className="text-sm text-slate-600 hover:text-slate-900">
+        <Link
+          href={`/reports/${id}`}
+          className="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+        >
           ← 詳細へ戻る
         </Link>
-        <h1 className="mt-4 text-2xl font-semibold text-slate-900">日報を編集</h1>
+        <h1 className="mt-4 text-2xl font-semibold text-slate-900 dark:text-white">
+          日報を編集
+        </h1>
       </div>
       <ReportEditForm
         reportId={report.id}

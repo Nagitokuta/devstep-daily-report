@@ -25,15 +25,17 @@ export default async function NewReportPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">日報を作成</h1>
+        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">
+          日報を作成
+        </h1>
         {teamId ? (
-          <p className="mt-1 text-sm text-slate-600">
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
             選択中のチームに紐づけて日報を投稿します。
           </p>
         ) : (
-          <p className="mt-1 text-sm text-slate-600">
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
             チーム未参加でも「全体公開」で投稿できます。「チーム内のみ」にするには
-            <Link href="/team" className="ml-1 underline">
+            <Link href="/team" className="ml-1 underline text-slate-900 dark:text-white">
               チーム画面
             </Link>
             から参加してください。

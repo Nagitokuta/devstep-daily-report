@@ -75,7 +75,10 @@ export function ReportForm({ teamId, defaultReportDate }: ReportFormProps) {
   return (
     <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
       <div>
-        <label htmlFor="title" className="mb-1 block text-sm font-medium text-slate-700">
+        <label
+          htmlFor="title"
+          className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300"
+        >
           タイトル（50文字以内）
         </label>
         <input
@@ -84,7 +87,7 @@ export function ReportForm({ teamId, defaultReportDate }: ReportFormProps) {
           onChange={(e) => setTitle(e.target.value)}
           maxLength={50}
           required
-          className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900"
+          className="w-full rounded border border-slate-300 bg-white dark:bg-slate-700 px-3 py-2 text-slate-900 dark:text-white"
         />
         {errors.title ? (
           <p className="mt-1 text-sm text-red-600">{errors.title}</p>
@@ -92,7 +95,10 @@ export function ReportForm({ teamId, defaultReportDate }: ReportFormProps) {
       </div>
 
       <div>
-        <label htmlFor="report_date" className="mb-1 block text-sm font-medium text-slate-700">
+        <label
+          htmlFor="report_date"
+          className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300"
+        >
           日付
         </label>
         <input
@@ -101,7 +107,7 @@ export function ReportForm({ teamId, defaultReportDate }: ReportFormProps) {
           value={reportDate}
           onChange={(e) => setReportDate(e.target.value)}
           required
-          className="w-full max-w-xs cursor-pointer rounded border border-slate-300 px-3 py-2 text-slate-900"
+          className="w-full max-w-xs cursor-pointer rounded border border-slate-300 bg-white dark:bg-slate-700 px-3 py-2 text-slate-900 dark:text-white"
         />
         {errors.report_date ? (
           <p className="mt-1 text-sm text-red-600">{errors.report_date}</p>
@@ -109,10 +115,12 @@ export function ReportForm({ teamId, defaultReportDate }: ReportFormProps) {
       </div>
 
       <div>
-        <span className="mb-1 block text-sm font-medium text-slate-700">カテゴリ</span>
+        <span className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+          カテゴリ
+        </span>
         <div className="flex flex-wrap gap-3">
           {REPORT_CATEGORIES.map((c) => (
-            <label key={c.value} className="flex items-center gap-2 text-sm">
+            <label key={c.value} className="flex items-center gap-2 text-sm dark:text-slate-200">
               <input
                 type="radio"
                 name="category"
@@ -131,10 +139,12 @@ export function ReportForm({ teamId, defaultReportDate }: ReportFormProps) {
       </div>
 
       <div>
-        <span className="mb-1 block text-sm font-medium text-slate-700">公開範囲</span>
+        <span className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+          公開範囲
+        </span>
         <div className="flex flex-wrap gap-3">
           {VISIBILITY_OPTIONS.map((v) => (
-            <label key={v.value} className="flex items-center gap-2 text-sm">
+            <label key={v.value} className="flex items-center gap-2 text-sm dark:text-slate-200">
               <input
                 type="radio"
                 name="visibility"
@@ -146,15 +156,15 @@ export function ReportForm({ teamId, defaultReportDate }: ReportFormProps) {
               />
               {v.label}
               {v.value === "team" && !teamId ? (
-                <span className="text-xs text-slate-500">（要チーム参加）</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">（要チーム参加）</span>
               ) : null}
             </label>
           ))}
         </div>
         {!teamId ? (
-          <p className="mt-2 text-xs text-slate-500">
+          <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
             チーム未参加のときは「全体公開」のみ保存できます。「チーム内のみ」は
-            <Link href="/team" className="underline">
+            <Link href="/team" className="underline text-slate-900 dark:text-white">
               チーム画面
             </Link>
             から参加後に選択できます。
@@ -166,7 +176,10 @@ export function ReportForm({ teamId, defaultReportDate }: ReportFormProps) {
       </div>
 
       <div>
-        <label htmlFor="content" className="mb-1 block text-sm font-medium text-slate-700">
+        <label
+          htmlFor="content"
+          className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300"
+        >
           本文（2000文字以内）
         </label>
         <textarea
@@ -176,9 +189,11 @@ export function ReportForm({ teamId, defaultReportDate }: ReportFormProps) {
           rows={12}
           required
           maxLength={2000}
-          className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900"
+          className="w-full rounded border border-slate-300 bg-white dark:bg-slate-700 px-3 py-2 text-slate-900 dark:text-white"
         />
-        <p className="mt-1 text-xs text-slate-500">{content.length} / 2000</p>
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          {content.length} / 2000
+        </p>
         {errors.content ? (
           <p className="mt-1 text-sm text-red-600">{errors.content}</p>
         ) : null}
@@ -194,13 +209,13 @@ export function ReportForm({ teamId, defaultReportDate }: ReportFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="rounded bg-slate-900 cursor-pointer px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+          className="rounded bg-slate-900 cursor-pointer px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-60"
         >
           {loading ? "保存中…" : "保存する"}
         </button>
         <Link
           href="/reports"
-          className="rounded border border-slate-300 cursor-pointer px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50"
+          className="rounded border border-slate-300 cursor-pointer px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
         >
           キャンセル
         </Link>

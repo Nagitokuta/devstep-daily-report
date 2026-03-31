@@ -150,48 +150,48 @@ export function CommentSection({
   }
 
   return (
-    <section className="mt-10 border-t border-slate-200 pt-8">
-      <h2 className="text-lg font-semibold text-slate-900">コメント</h2>
+    <section className="mt-10 border-t border-slate-200 pt-8 dark:border-slate-700">
+      <h2 className="text-lg font-semibold text-slate-900 dark:text-white">コメント</h2>
+    
       <ul className="mt-4 space-y-4">
         {comments.map((c) => (
           <li
             key={c.id}
-            className="rounded-lg border border-slate-100 bg-slate-50 px-4 py-3"
+            className="rounded-lg border border-slate-100 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800"
           >
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <span className="text-sm font-medium text-slate-900">
+              <span className="text-sm font-medium text-slate-900 dark:text-white">
                 {commentAuthor(c.users)}
               </span>
-              <time className="text-xs text-slate-500" dateTime={c.created_at}>
+              <time className="text-xs text-slate-500 dark:text-slate-400" dateTime={c.created_at}>
                 {new Date(c.created_at).toLocaleString("ja-JP")}
               </time>
             </div>
-            <p className="mt-2 whitespace-pre-wrap text-sm text-slate-800">{c.content}</p>
+    
+            <p className="mt-2 whitespace-pre-wrap text-sm text-slate-800 dark:text-slate-200">
+              {c.content}
+            </p>
+    
             <div className="mt-2 flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() =>
-                handleLike(
-                  c.id,
-                  isLiked(c.comment_likes, currentUserId)
-                )
-              }
-              className="flex items-center gap-1 text-xs cursor-pointer text-slate-500 hover:text-blue-500 transition active:scale-110"
-            >
-
-              <ThumbsUp
-                size={16}
-                className={`transition ${
-                  isLiked(c.comment_likes, currentUserId)
-                    ? "fill-blue-200 text-blue-500"
-                    : ""
-                }`}
-              />
-
-              <span>{likeCount(c.comment_likes)}</span>
-
-            </button>
+              <button
+                type="button"
+                onClick={() =>
+                  handleLike(c.id, isLiked(c.comment_likes, currentUserId))
+                }
+                className="flex items-center gap-1 text-xs cursor-pointer text-slate-500 dark:text-slate-400 hover:text-blue-500 transition active:scale-110"
+              >
+                <ThumbsUp
+                  size={16}
+                  className={`transition ${
+                    isLiked(c.comment_likes, currentUserId)
+                      ? "fill-blue-200 text-blue-500"
+                      : ""
+                  }`}
+                />
+                <span>{likeCount(c.comment_likes)}</span>
+              </button>
             </div>
+    
             {c.user_id === currentUserId ? (
               <button
                 type="button"
@@ -204,9 +204,12 @@ export function CommentSection({
           </li>
         ))}
       </ul>
-
+    
       <form onSubmit={(e) => void handleSubmit(e)} className="mt-6 space-y-2">
-        <label htmlFor="comment" className="block text-sm font-medium text-slate-700">
+        <label
+          htmlFor="comment"
+          className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+        >
           コメントを追加（500文字以内）
         </label>
         <textarea
@@ -215,7 +218,7 @@ export function CommentSection({
           onChange={(e) => setBody(e.target.value)}
           rows={4}
           maxLength={500}
-          className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900"
+          className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
         />
         {error ? (
           <p className="text-sm text-red-600" role="alert">
@@ -225,7 +228,7 @@ export function CommentSection({
         <button
           type="submit"
           disabled={loading}
-          className="rounded bg-slate-900 cursor-pointer px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+          className="rounded bg-slate-900 cursor-pointer px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-60"
         >
           {loading ? "送信中…" : "投稿する"}
         </button>

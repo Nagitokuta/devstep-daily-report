@@ -26,9 +26,8 @@ export default async function ReportDetailPage({ params }: PageProps) {
   }
 
   const { data: report, error } = await supabase
-    .from("daily_reports")
-    .select(
-      `
+  .from("daily_reports")
+    .select(`
       id,
       title,
       report_date,
@@ -44,10 +43,10 @@ export default async function ReportDetailPage({ params }: PageProps) {
         content,
         created_at,
         user_id,
-        users ( name, avatar_url )
+        users ( name, avatar_url ),
+        comment_likes ( user_id )
       )
-    `,
-    )
+    `)
     .eq("id", id)
     .maybeSingle();
 
@@ -82,12 +81,13 @@ export default async function ReportDetailPage({ params }: PageProps) {
     <article>
       <Link
         href="/reports"
-        className="text-sm text-slate-600 hover:text-slate-900"
+        className="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
       >
         ← 一覧へ
       </Link>
-      <header className="mt-4 border-b border-slate-200 pb-6">
-        <h1 className="text-2xl font-semibold text-slate-900">{report.title}</h1>
+    
+      <header className="mt-4 border-b border-slate-200 pb-6 dark:border-slate-700">
+        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">{report.title}</h1>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           {avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -97,29 +97,29 @@ export default async function ReportDetailPage({ params }: PageProps) {
               className="h-12 w-12 rounded-full object-cover"
             />
           ) : (
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-200 text-lg text-slate-700">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-200 text-lg text-slate-700 dark:bg-slate-700 dark:text-slate-300">
               {authorName.slice(0, 1)}
             </span>
           )}
           <div>
-            <p className="font-medium text-slate-900">{authorName}</p>
-            <p className="text-sm text-slate-600">
+            <p className="font-medium text-slate-900 dark:text-white">{authorName}</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               日付 {report.report_date} · {categoryLabel(report.category)} ·{" "}
               {visibilityLabel(report.visibility)}
             </p>
-            <p className="text-xs text-slate-500">
-              作成 {formatDate(report.created_at)} / 更新{" "}
-              {formatDate(report.updated_at)}
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              作成 {formatDate(report.created_at)} / 更新 {formatDate(report.updated_at)}
             </p>
           </div>
         </div>
       </header>
-      <div className="prose prose-slate mt-6 max-w-none">
-        <p className="whitespace-pre-wrap text-slate-800">{report.content}</p>
+    
+      <div className="prose prose-slate mt-6 max-w-none dark:prose-invert">
+        <p className="whitespace-pre-wrap text-slate-800 dark:text-slate-200">{report.content}</p>
       </div>
-
+    
       {isOwner ? <ReportActions reportId={report.id} /> : null}
-
+    
       <CommentSection
         reportId={report.id}
         currentUserId={user.id}

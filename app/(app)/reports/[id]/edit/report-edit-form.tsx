@@ -76,7 +76,10 @@ export function ReportEditForm({ reportId, initial }: ReportEditFormProps) {
   return (
     <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
       <div>
-        <label htmlFor="title" className="mb-1 block text-sm font-medium text-slate-700">
+        <label
+          htmlFor="title"
+          className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300"
+        >
           タイトル（50文字以内）
         </label>
         <input
@@ -85,15 +88,18 @@ export function ReportEditForm({ reportId, initial }: ReportEditFormProps) {
           onChange={(e) => setTitle(e.target.value)}
           maxLength={50}
           required
-          className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900"
+          className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
         />
-        {errors.title ? (
+        {errors.title && (
           <p className="mt-1 text-sm text-red-600">{errors.title}</p>
-        ) : null}
+        )}
       </div>
 
       <div>
-        <label htmlFor="report_date" className="mb-1 block text-sm font-medium text-slate-700">
+        <label
+          htmlFor="report_date"
+          className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300"
+        >
           日付
         </label>
         <input
@@ -102,15 +108,17 @@ export function ReportEditForm({ reportId, initial }: ReportEditFormProps) {
           value={reportDate}
           onChange={(e) => setReportDate(e.target.value)}
           required
-          className="w-full max-w-xs cursor-pointer rounded border border-slate-300 px-3 py-2 text-slate-900"
+          className="w-full max-w-xs cursor-pointer rounded border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
         />
-        {errors.report_date ? (
+        {errors.report_date && (
           <p className="mt-1 text-sm text-red-600">{errors.report_date}</p>
-        ) : null}
+        )}
       </div>
 
       <div>
-        <span className="mb-1 block text-sm font-medium text-slate-700">カテゴリ</span>
+        <span className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+          カテゴリ
+        </span>
         <div className="flex flex-wrap gap-3">
           {REPORT_CATEGORIES.map((c) => (
             <label key={c.value} className="flex items-center gap-2 text-sm">
@@ -126,13 +134,15 @@ export function ReportEditForm({ reportId, initial }: ReportEditFormProps) {
             </label>
           ))}
         </div>
-        {errors.category ? (
+        {errors.category && (
           <p className="mt-1 text-sm text-red-600">{errors.category}</p>
-        ) : null}
+        )}
       </div>
 
       <div>
-        <span className="mb-1 block text-sm font-medium text-slate-700">公開範囲</span>
+        <span className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+          公開範囲
+        </span>
         <div className="flex flex-wrap gap-3">
           {VISIBILITY_OPTIONS.map((v) => (
             <label key={v.value} className="flex items-center gap-2 text-sm">
@@ -148,13 +158,16 @@ export function ReportEditForm({ reportId, initial }: ReportEditFormProps) {
             </label>
           ))}
         </div>
-        {errors.visibility ? (
+        {errors.visibility && (
           <p className="mt-1 text-sm text-red-600">{errors.visibility}</p>
-        ) : null}
+        )}
       </div>
 
       <div>
-        <label htmlFor="content" className="mb-1 block text-sm font-medium text-slate-700">
+        <label
+          htmlFor="content"
+          className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300"
+        >
           本文（2000文字以内）
         </label>
         <textarea
@@ -164,19 +177,21 @@ export function ReportEditForm({ reportId, initial }: ReportEditFormProps) {
           rows={12}
           required
           maxLength={2000}
-          className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900"
+          className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
         />
-        <p className="mt-1 text-xs text-slate-500">{content.length} / 2000</p>
-        {errors.content ? (
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          {content.length} / 2000
+        </p>
+        {errors.content && (
           <p className="mt-1 text-sm text-red-600">{errors.content}</p>
-        ) : null}
+        )}
       </div>
 
-      {errors.form ? (
+      {errors.form && (
         <p className="text-sm text-red-600" role="alert">
           {errors.form}
         </p>
-      ) : null}
+      )}
 
       <div className="flex flex-wrap gap-3">
         <button
@@ -188,7 +203,7 @@ export function ReportEditForm({ reportId, initial }: ReportEditFormProps) {
         </button>
         <Link
           href={`/reports/${reportId}`}
-          className="rounded border border-slate-300 px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50"
+          className="rounded border border-slate-300 px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
         >
           キャンセル
         </Link>

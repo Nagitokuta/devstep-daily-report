@@ -61,9 +61,9 @@ export function TeamMembers({ teamId }: { teamId: string }) {
   if (error) return <p className="text-red-600">{error}</p>;
 
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-900">メンバー</h2>
-      <ul className="mt-4 divide-y divide-slate-100">
+    <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+      <h2 className="text-lg font-semibold text-slate-900 dark:text-white">メンバー</h2>
+      <ul className="mt-4 divide-y divide-slate-100 dark:divide-slate-700">
         {members.map((m) => (
           <li key={m.user_id} className="flex items-center gap-3 py-3">
             {m.avatar_url ? (
@@ -73,13 +73,13 @@ export function TeamMembers({ teamId }: { teamId: string }) {
                 className="h-10 w-10 rounded-full object-cover"
               />
             ) : (
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200 text-sm text-slate-700">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200 text-sm text-slate-700 dark:bg-slate-700 dark:text-slate-200">
                 {m.name.slice(0, 1)}
               </span>
             )}
             <div>
-              <p className="font-medium text-slate-900">{m.name}</p>
-              <p className="text-xs text-slate-500">
+              <p className="font-medium text-slate-900 dark:text-white">{m.name}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 参加: {new Date(m.joined_at).toLocaleString("ja-JP")}
               </p>
             </div>

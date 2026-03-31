@@ -141,83 +141,83 @@ export default async function ReportsPage({
 
   return (
     <div className="space-y-6">
-     <div className="flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <h1 className="text-2xl font-semibold text-slate-900">日報一覧</h1>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">日報一覧</h1>
 
-        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <div className="mt-2 flex flex-wrap items-center gap-2">
 
-          <Link
-            href={`/reports${q ? `?q=${q}` : ""}`}
-            className={`rounded-full px-3 py-1 text-sm border ${
-              !category
-                ? "bg-slate-900 text-white border-slate-900"
-                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
-            }`}
-          >
-            全て
-          </Link>
+            <Link
+              href={`/reports${q ? `?q=${q}` : ""}`}
+              className={`rounded-full px-3 py-1 text-sm border ${
+                !category
+                  ? "bg-slate-900 text-white border-slate-900"
+                  : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-600 dark:hover:text-white"
+              }`}
+            >
+              全て
+            </Link>
 
-          <Link
-            href={`/reports?category=development${q ? `&q=${q}` : ""}`}
-            className={`rounded-full px-3 py-1 text-sm border ${
-              category === "development"
-                ? "bg-slate-900 text-white border-slate-900"
-                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
-            }`}
-          >
-            開発
-          </Link>
+            <Link
+              href={`/reports?category=development${q ? `&q=${q}` : ""}`}
+              className={`rounded-full px-3 py-1 text-sm border ${
+                category === "development"
+                  ? "bg-slate-900 text-white border-slate-900"
+                  : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-600 dark:hover:text-white"
+              }`}
+            >
+              開発
+            </Link>
 
-          <Link
-            href={`/reports?category=meeting${q ? `&q=${q}` : ""}`}
-            className={`rounded-full px-3 py-1 text-sm border ${
-              category === "meeting"
-                ? "bg-slate-900 text-white border-slate-900"
-                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
-            }`}
-          >
-            会議
-          </Link>
+            <Link
+              href={`/reports?category=meeting${q ? `&q=${q}` : ""}`}
+              className={`rounded-full px-3 py-1 text-sm border ${
+                category === "meeting"
+                  ? "bg-slate-900 text-white border-slate-900"
+                  : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-600 dark:hover:text-white"
+              }`}
+            >
+              会議
+            </Link>
 
-          <Link
-            href={`/reports?category=other${q ? `&q=${q}` : ""}`}
-            className={`rounded-full px-3 py-1 text-sm border ${
-              category === "other"
-                ? "bg-slate-900 text-white border-slate-900"
-                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
-            }`}
-          >
-            その他
-          </Link>
+            <Link
+              href={`/reports?category=other${q ? `&q=${q}` : ""}`}
+              className={`rounded-full px-3 py-1 text-sm border ${
+                category === "other"
+                  ? "bg-slate-900 text-white border-slate-900"
+                  : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-600 dark:hover:text-white"
+              }`}
+            >
+              その他
+            </Link>
+
+          </div>
+
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+            {selectedTeamId
+              ? "全体公開の日報と、選択中チームの「チーム内のみ」日報を表示しています。"
+              : "全体公開の日報を表示しています。チーム参加後はチーム内公開の日報も表示されます。"}
+          </p>
+
+          {q ? (
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              検索: {q}
+            </p>
+          ) : null}
 
         </div>
 
-        <p className="mt-2 text-sm text-slate-600">
-          {selectedTeamId
-            ? "全体公開の日報と、選択中チームの「チーム内のみ」日報を表示しています。"
-            : "全体公開の日報を表示しています。チーム参加後はチーム内公開の日報も表示されます。"}
-        </p>
-
-        {q ? (
-          <p className="mt-1 text-sm text-slate-500">
-            検索: {q}
-          </p>
-        ) : null}
+        <Link
+          href="/reports/new"
+          className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+        >
+          新規作成
+        </Link>
 
       </div>
 
-      <Link
-        href="/reports/new"
-        className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
-      >
-        新規作成
-      </Link>
-
-    </div>
-
       {rows.length === 0 ? (
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-slate-600 dark:text-slate-400">
           {q ? "該当する日報がありません。" : "まだ日報がありません。"}
         </p>
       ) : (
@@ -226,23 +226,22 @@ export default async function ReportsPage({
             <li key={r.id}>
               <Link
                 href={`/reports/${r.id}`}
-                className="block rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300"
+                className="block rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:hover:border-slate-500"
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <h2 className="text-lg font-semibold text-slate-900">{r.title}</h2>
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{r.title}</h2>
                   <time
                     dateTime={r.created_at}
-                    className="text-xs text-slate-500"
+                    className="text-xs text-slate-500 dark:text-slate-400"
                   >
                     {formatDate(r.created_at)}
                   </time>
                 </div>
-                <p className="mt-1 text-sm text-slate-600">
-                  {authorName(r.users)} · {r.report_date} ·{" "}
-                  {categoryLabel(r.category)} · {visibilityLabel(r.visibility)}
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                  {authorName(r.users)} · {r.report_date} · {categoryLabel(r.category)} · {visibilityLabel(r.visibility)}
                 </p>
-                <p className="mt-2 text-sm text-slate-700">{excerpt(r.content)}</p>
-                <p className="mt-2 text-xs text-slate-500">
+                <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">{excerpt(r.content)}</p>
+                <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                   コメント {commentCount(r)} 件
                 </p>
               </Link>
