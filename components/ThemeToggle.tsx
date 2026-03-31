@@ -7,11 +7,20 @@ export function ThemeToggle() {
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("theme");
+    // Cookieからテーマを取得
+    const cookieTheme = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("theme="))
+      ?.split("=")[1];
 
-    if (saved === "dark") {
-      setDark(true);
+    const isDark = cookieTheme === "dark";
+
+    setDark(isDark);
+
+    if (isDark) {
       document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
     }
   }, []);
 
@@ -21,22 +30,20 @@ export function ThemeToggle() {
 
     if (next) {
       document.documentElement.classList.add("dark");
-      localStorage.setItem("theme","dark");
+      document.cookie = "theme=dark; path=/; max-age=31536000"; // 1年保持
     } else {
       document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme","light");
+      document.cookie = "theme=light; path=/; max-age=31536000";
     }
   }
 
   return (
     <div className="mt-6 flex items-center justify-between rounded-xl border border-slate-200 p-6">
-
       <div>
         <div className="flex items-center gap-2 text-base font-medium text-slate-900 dark:text-white">
           {dark ? <Moon size={18}/> : <Sun size={18}/>}
           ダークモード
         </div>
-
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           画面テーマを切り替えます
         </p>
@@ -45,20 +52,17 @@ export function ThemeToggle() {
       <button
         onClick={toggle}
         className={`
-            relative h-8 w-16 cursor-pointer rounded-full transition
-            ${dark ? "bg-sky-600" : "bg-slate-300"}
+          relative h-8 w-16 cursor-pointer rounded-full transition
+          ${dark ? "bg-sky-600" : "bg-slate-300"}
         `}
-        >
-
+      >
         <div
-        className={`
+          className={`
             absolute top-1 h-6 w-6 rounded-full bg-white shadow transition
             ${dark ? "left-8" : "left-1"}
-        `}
+          `}
         />
-
-    </button>
-    
+      </button>
     </div>
   );
 }

@@ -1,47 +1,22 @@
-import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ReactNode } from "react";
+import { headers } from "next/headers";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  // SSRでCookieを読む
+  const headersList = await headers(); 
+  const cookieHeader = headersList.get("cookie") ?? "";
+  const isDark = cookieHeader.includes("theme=dark");
 
-export const metadata: Metadata = {
-  title: "Daily Report",
-  description: "チームで日報を共有・管理するアプリ",
-};
-
-export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-<html lang="ja" className="h-full antialiased">
-  <body
-    className="min-h-full flex flex-col transition-colors duration-500"
-  >
-    <script
-      dangerouslySetInnerHTML={{
-        __html: `
-          (function() {
-            try {
-              const theme = localStorage.getItem('theme');
-              const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-              const isDark = theme === 'dark' || (!theme && prefersDark);
-              document.documentElement.classList.add(isDark ? 'dark' : 'light');
-              // 一旦 body を visible にする
-              document.body.style.visibility = 'visible';
-            } catch(e) {}
-          })();
-        `,
-      }}
-    />
-    {children}
-  </body>
-</html>
+    <html lang="ja" className={`h-full antialiased ${isDark ? "dark" : ""}`}>
+      <body className="min-h-full flex flex-col bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-500">
+        {children}
+      </body>
+    </html>
   );
 }
