@@ -24,12 +24,31 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="ja"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
-      <DarkModeProvider>{children}</DarkModeProvider>
+    <html lang="ja" className="h-full antialiased">
+      <body className="min-h-full flex flex-col
+                      bg-white dark:bg-slate-900
+                      text-slate-900 dark:text-slate-100
+                      transition-colors duration-500"
+      >
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = localStorage.getItem('theme');
+                  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  if (theme === 'dark' || (!theme && prefersDark)) {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch(e) {}
+              })();
+            `,
+          }}
+        />
+
+        {children}
       </body>
     </html>
   );

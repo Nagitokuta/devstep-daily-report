@@ -1,24 +1,20 @@
 "use client";
 
-import { useEffect, useState, ReactNode } from "react";
+import { useEffect } from "react";
 
-export default function DarkModeProvider({ children }: { children: ReactNode }) {
-  const [mounted, setMounted] = useState(false);
-
+export default function DarkModeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    const theme = localStorage.getItem("theme");
+    // 初期ロード時に localStorage を確認して dark クラスを付与
+    const saved = localStorage.getItem("theme");
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-    if (theme === "dark" || (!theme && prefersDark)) {
+    if (saved === "dark" || (!saved && prefersDark)) {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
-
-    setMounted(true);
   }, []);
 
-  if (!mounted) return null;
-
+  // 常に子要素を描画
   return <>{children}</>;
 }

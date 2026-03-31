@@ -157,7 +157,7 @@ export function CommentSection({
         {comments.map((c) => (
           <li
             key={c.id}
-            className="rounded-lg border border-slate-100 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800"
+            className="rounded-lg border border-slate-100 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-700"
           >
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <span className="text-sm font-medium text-slate-900 dark:text-white">
@@ -218,7 +218,7 @@ export function CommentSection({
           onChange={(e) => setBody(e.target.value)}
           rows={4}
           maxLength={500}
-          className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+          className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-600 dark:text-slate-200"
         />
         {error ? (
           <p className="text-sm text-red-600" role="alert">
