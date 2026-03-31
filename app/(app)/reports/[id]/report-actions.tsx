@@ -38,7 +38,7 @@ export function ReportActions({ reportId }: ReportActionsProps) {
     <div className="mt-6 flex flex-wrap gap-3">
       <Link
         href={`/reports/${reportId}/edit`}
-        className="rounded border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50"
+        className="rounded border border-slate-300 bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:hover:bg-slate-800 dark:shadow-lg"
       >
         編集
       </Link>
@@ -46,7 +46,7 @@ export function ReportActions({ reportId }: ReportActionsProps) {
         type="button"
         disabled={loading}
         onClick={() => void handleDelete()}
-        className="rounded border border-red-200 cursor-pointer bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-60"
+        className="rounded border border-red-200 cursor-pointer bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 dark:bg-red-500 dark:text-white dark:border-red-300 dark:hover:bg-red-400 disabled:opacity-60"
       >
         {loading ? "削除中…" : "削除"}
       </button>

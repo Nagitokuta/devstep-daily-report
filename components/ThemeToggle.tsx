@@ -38,7 +38,7 @@ export function ThemeToggle() {
   }
 
   return (
-    <div className="mt-6 flex items-center justify-between rounded-xl border border-slate-200 p-6">
+    <div className="mt-6 flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-600 p-6">
       <div>
         <div className="flex items-center gap-2 text-base font-medium text-slate-900 dark:text-white">
           {dark ? <Moon size={18}/> : <Sun size={18}/>}

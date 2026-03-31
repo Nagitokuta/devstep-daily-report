@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { FileText } from "lucide-react";
 
 const navItems = [
   { href: "/profile", label: "プロフィール" },
@@ -51,7 +52,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
       border-r border-slate-200 dark:border-slate-600
       bg-white dark:bg-slate-800/95 backdrop-blur
       transition-transform md:w-56 md:translate-x-0 ${
-        isOpen ? "translate-x-0" : "-translate-x-full"
+        isOpen ? "translate-x-0 top-0" : "-translate-x-full"
       }`}
     >
       <div className="p-4 md:p-5">
@@ -59,16 +60,19 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
           href="/reports"
           onClick={onClose}
           className="
-          text-3xl font-semibold md:text-4xl
-          text-slate-900 dark:text-slate-100
-          transition-colors
+            flex items-center gap-2
+            text-xl font-semibold md:text-2xl
+            text-slate-900 dark:text-white
+            hover:opacity-80
+            transition
           "
         >
-          {pageTitle}
+          <FileText size={26} className="text-sky-600 dark:text-sky-400"/>
+          DailyReport
         </Link>
       </div>
   
-      <nav className="space-y-1 px-3 pb-4 md:px-4">
+      <nav className="space-y-1 px-3 pb-4 md:px-4 text-sm">
         {navItems.map((item) => {
           const active = (() => {
             if (item.href === "/reports/new") {

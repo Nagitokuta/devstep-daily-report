@@ -85,41 +85,56 @@ export default async function ReportDetailPage({ params }: PageProps) {
       >
         ← 一覧へ
       </Link>
-    
-      <header className="mt-4 border-b border-slate-200 pb-6 dark:border-slate-700">
-        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">{report.title}</h1>
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          {avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={avatarUrl}
-              alt=""
-              className="h-12 w-12 rounded-full object-cover"
-            />
-          ) : (
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-200 text-lg text-slate-700 dark:bg-slate-700 dark:text-slate-300">
-              {authorName.slice(0, 1)}
-            </span>
-          )}
-          <div>
-            <p className="font-medium text-slate-900 dark:text-white">{authorName}</p>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              日付 {report.report_date} · {categoryLabel(report.category)} ·{" "}
-              {visibilityLabel(report.visibility)}
-            </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              作成 {formatDate(report.created_at)} / 更新 {formatDate(report.updated_at)}
-            </p>
+      <div className="
+        rounded-xl
+        bg-white dark:bg-slate-700
+        border border-slate-200 dark:border-slate-600
+        p-8 mt-6
+        shadow-sm
+      ">
+        <header className="mt-4 border-b border-slate-200 pb-6 dark:border-slate-500">
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">{report.title}</h1>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            {avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={avatarUrl}
+                alt=""
+                className="h-12 w-12 rounded-full object-cover"
+              />
+            ) : (
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-200 text-lg text-slate-700 dark:bg-slate-700 dark:text-slate-300">
+                {authorName.slice(0, 1)}
+              </span>
+            )}
+            <div>
+              <p className="font-medium text-slate-900 dark:text-white">{authorName}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                日付 {report.report_date} · {categoryLabel(report.category)} ·{" "}
+                {visibilityLabel(report.visibility)}
+              </p>
+              <p className="text-xs text-white0 dark:text-slate-400">
+                作成 {formatDate(report.created_at)} / 更新 {formatDate(report.updated_at)}
+              </p>
+            </div>
+          </div>
+        </header>
+      
+        <div className="
+          rounded-xl
+          bg-white dark:bg-slate-600
+          border border-slate-200 dark:border-slate-600
+          p-2 mt-6
+          shadow-sm
+        ">
+          <div className="prose prose-slate my-6 max-w-none dark:prose-invert">
+            <p className="whitespace-pre-wrap text-slate-800 dark:text-slate-200">{report.content}</p>
           </div>
         </div>
-      </header>
-    
-      <div className="prose prose-slate mt-6 max-w-none dark:prose-invert">
-        <p className="whitespace-pre-wrap text-slate-800 dark:text-slate-200">{report.content}</p>
+
+        {isOwner ? <ReportActions reportId={report.id} /> : null}
       </div>
-    
-      {isOwner ? <ReportActions reportId={report.id} /> : null}
-    
+
       <CommentSection
         reportId={report.id}
         currentUserId={user.id}
