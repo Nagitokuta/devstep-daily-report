@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { commentSchema } from "@/lib/validations/report";
+import { ThumbsUp } from "lucide-react";
 
 type CommentRow = {
   id: string;
@@ -14,6 +15,7 @@ type CommentRow = {
     | { name: string; avatar_url: string | null }
     | { name: string; avatar_url: string | null }[]
     | null;
+  comment_likes?: { user_id: string }[];
 };
 
 type CommentSectionProps = {
@@ -26,6 +28,17 @@ function commentAuthor(users: CommentRow["users"]): string {
   if (!users) return "不明";
   const u = Array.isArray(users) ? users[0] : users;
   return u?.name ?? "不明";
+}
+
+function likeCount(likes?: { user_id: string }[]) {
+  return likes?.length ?? 0;
+}
+
+function isLiked(
+  likes: { user_id: string }[] | undefined,
+  userId: string,
+) {
+  return likes?.some(l => l.user_id === userId) ?? false;
 }
 
 export function CommentSection({
@@ -63,15 +76,14 @@ export function CommentSection({
         user_id: user.id,
         content: parsed.data,
       })
-      .select(
-        `
+      .select(`
         id,
         content,
         created_at,
         user_id,
-        users ( name, avatar_url )
-      `,
-      )
+        users ( name, avatar_url ),
+        comment_likes ( user_id )
+      `)
       .single();
     setLoading(false);
     if (insertError) {
@@ -102,6 +114,41 @@ export function CommentSection({
     router.refresh();
   }
 
+  async function handleLike(commentId: string, liked: boolean) {
+    const supabase = createClient();
+  
+    if (liked) {
+      await supabase
+        .from("comment_likes")
+        .delete()
+        .eq("comment_id", commentId)
+        .eq("user_id", currentUserId);
+    } else {
+      await supabase
+        .from("comment_likes")
+        .insert({
+          comment_id: commentId,
+          user_id: currentUserId,
+        });
+    }
+  
+    const { data } = await supabase
+      .from("comments")
+      .select(`
+        id,
+        content,
+        created_at,
+        user_id,
+        users ( name, avatar_url ),
+        comment_likes ( user_id )
+      `)
+      .eq("report_id", reportId);
+  
+    if (data) {
+      setComments(data as CommentRow[]);
+    }
+  }
+
   return (
     <section className="mt-10 border-t border-slate-200 pt-8">
       <h2 className="text-lg font-semibold text-slate-900">コメント</h2>
@@ -120,6 +167,31 @@ export function CommentSection({
               </time>
             </div>
             <p className="mt-2 whitespace-pre-wrap text-sm text-slate-800">{c.content}</p>
+            <div className="mt-2 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() =>
+                handleLike(
+                  c.id,
+                  isLiked(c.comment_likes, currentUserId)
+                )
+              }
+              className="flex items-center gap-1 text-xs cursor-pointer text-slate-500 hover:text-blue-500 transition active:scale-110"
+            >
+
+              <ThumbsUp
+                size={16}
+                className={`transition ${
+                  isLiked(c.comment_likes, currentUserId)
+                    ? "fill-blue-200 text-blue-500"
+                    : ""
+                }`}
+              />
+
+              <span>{likeCount(c.comment_likes)}</span>
+
+            </button>
+            </div>
             {c.user_id === currentUserId ? (
               <button
                 type="button"
