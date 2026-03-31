@@ -20,8 +20,10 @@ type ReportListRow = {
 
 function authorName(users: ReportListRow["users"]): string {
   if (!users) return "不明";
+
   const u = Array.isArray(users) ? users[0] : users;
-  return u?.name ?? "不明";
+
+  return u?.name || "名無し";
 }
 
 function commentCount(row: ReportListRow): number {
@@ -51,20 +53,24 @@ export function formatDate(date: string) {
 export default async function ReportsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; category?: string }>;
 }) {
   const supabase = await createClient();
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
   if (!user) {
     return null;
   }
 
   const params = await searchParams;
   const q = normalizeSearchTerm(params.q ?? "");
+  const category = params.category ?? "";
 
   const selectedTeamId = await getSelectedTeamId(supabase, user.id);
+
   let query = supabase
     .from("daily_reports")
     .select(
@@ -76,22 +82,49 @@ export default async function ReportsPage({
       visibility,
       content,
       created_at,
-      users!daily_reports_user_id_fkey ( name, avatar_url ),
+      users!daily_reports_user_id_fkey (
+        name,
+        avatar_url
+      ),
       comments(count)
-    `,
+    `
     )
     .order("created_at", { ascending: false });
 
+  // 公開範囲条件
   if (selectedTeamId) {
     query = query.or(
-      `visibility.eq.global,and(team_id.eq.${selectedTeamId},visibility.eq.team)`,
+      `visibility.eq.global,and(visibility.eq.team,team_id.eq.${selectedTeamId})`
     );
   } else {
     query = query.eq("visibility", "global");
   }
 
+  if (category) {
+    query = query.eq("category", category);
+  }
+
+  // 検索条件
   if (q) {
-    query = query.or(`title.ilike.%${q}%,content.ilike.%${q}%`);
+
+    // ユーザー名一致ユーザー取得
+    const { data: matchedUsers } = await supabase
+      .from("users")
+      .select("id")
+      .ilike("name", `%${q}%`);
+  
+    const userIds = matchedUsers?.map(u => u.id) ?? [];
+  
+    let orConditions = [
+      `title.ilike.%${q}%`,
+      `content.ilike.%${q}%`
+    ];
+  
+    if (userIds.length > 0) {
+      orConditions.push(`user_id.in.(${userIds.join(",")})`);
+    }
+  
+    query = query.or(orConditions.join(","));
   }
 
   const { data: reports, error } = await query;
@@ -108,23 +141,80 @@ export default async function ReportsPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900">日報一覧</h1>
-          <p className="mt-1 text-sm text-slate-600">
-            {selectedTeamId
-              ? "全体公開の日報と、選択中チームの「チーム内のみ」日報を表示しています。"
-              : "全体公開の日報を表示しています。チーム参加後はチーム内公開の日報も表示されます。"}
-          </p>
-          {q ? <p className="mt-1 text-sm text-slate-500">検索: {q}</p> : null}
+     <div className="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <h1 className="text-2xl font-semibold text-slate-900">日報一覧</h1>
+
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+
+          <Link
+            href={`/reports${q ? `?q=${q}` : ""}`}
+            className={`rounded-full px-3 py-1 text-sm border ${
+              !category
+                ? "bg-slate-900 text-white border-slate-900"
+                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
+            }`}
+          >
+            全て
+          </Link>
+
+          <Link
+            href={`/reports?category=development${q ? `&q=${q}` : ""}`}
+            className={`rounded-full px-3 py-1 text-sm border ${
+              category === "development"
+                ? "bg-slate-900 text-white border-slate-900"
+                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
+            }`}
+          >
+            開発
+          </Link>
+
+          <Link
+            href={`/reports?category=meeting${q ? `&q=${q}` : ""}`}
+            className={`rounded-full px-3 py-1 text-sm border ${
+              category === "meeting"
+                ? "bg-slate-900 text-white border-slate-900"
+                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
+            }`}
+          >
+            会議
+          </Link>
+
+          <Link
+            href={`/reports?category=other${q ? `&q=${q}` : ""}`}
+            className={`rounded-full px-3 py-1 text-sm border ${
+              category === "other"
+                ? "bg-slate-900 text-white border-slate-900"
+                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
+            }`}
+          >
+            その他
+          </Link>
+
         </div>
-        <Link
-          href="/reports/new"
-          className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
-        >
-          新規作成
-        </Link>
+
+        <p className="mt-2 text-sm text-slate-600">
+          {selectedTeamId
+            ? "全体公開の日報と、選択中チームの「チーム内のみ」日報を表示しています。"
+            : "全体公開の日報を表示しています。チーム参加後はチーム内公開の日報も表示されます。"}
+        </p>
+
+        {q ? (
+          <p className="mt-1 text-sm text-slate-500">
+            検索: {q}
+          </p>
+        ) : null}
+
       </div>
+
+      <Link
+        href="/reports/new"
+        className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+      >
+        新規作成
+      </Link>
+
+    </div>
 
       {rows.length === 0 ? (
         <p className="text-sm text-slate-600">
