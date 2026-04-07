@@ -156,12 +156,22 @@ comments {
  timestamp created_at
 }
 
+comment_likes {
+ uuid id PK
+ uuid comment_id FK
+ uuid user_id FK
+ timestamp created_at
+}
+
 teams ||--o{ team_members : has
 users ||--o{ team_members : joins
 users ||--o{ daily_reports : creates
 users ||--o{ comments : writes
 daily_reports ||--o{ comments : has
 teams ||--o{ daily_reports : contains
+
+comments ||--o{ comment_likes : has
+users ||--o{ comment_likes : likes
 ```
 
 ## 技術的な工夫点
