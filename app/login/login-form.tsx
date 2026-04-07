@@ -37,17 +37,17 @@ export function LoginForm() {
 
   return (
     <div className="mx-auto flex min-h-full w-full max-w-md md:w-1/2 flex-col justify-center px-4 py-16">
-      <h1 className="mb-6 text-center text-2xl font-semibold text-slate-900">
+      <h1 className="mb-6 text-center text-2xl font-semibold text-slate-900 dark:text-slate-100">
         ログイン
       </h1>
       <form
         onSubmit={handleSubmit}
-        className="space-y-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+        className="space-y-4 rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 bg-white p-6 shadow-sm"
       >
         <div>
           <label
             htmlFor="email"
-            className="mb-1 block text-sm font-medium text-slate-700"
+            className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300"
           >
             メールアドレス
           </label>
@@ -58,13 +58,13 @@ export function LoginForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900"
+            className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900 dark:text-slate-100 dark:border-slate-600 dark:bg-slate-700"
           />
         </div>
         <div>
           <label
             htmlFor="password"
-            className="mb-1 block text-sm font-medium text-slate-700"
+            className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300"
           >
             パスワード
           </label>
@@ -75,7 +75,7 @@ export function LoginForm() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900"
+            className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900 dark:text-slate-100 dark:border-slate-600 dark:bg-slate-700"
           />
         </div>
         {error ? (
@@ -86,17 +86,17 @@ export function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded bg-slate-900 cursor-pointer py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+          className="w-full rounded bg-slate-900 cursor-pointer py-2 text-sm font-medium text-white dark:text-white dark:bg-slate-900 hover:dark:bg-slate-700 hover:bg-slate-800 disabled:opacity-60"
         >
           {loading ? "送信中…" : "ログイン"}
         </button>
       </form>
       <p className="mt-6 text-center text-sm text-slate-600">
-        <Link href="/signup" className="text-slate-900 underline">
+        <Link href="/signup" className="text-slate-900 dark:text-slate-100">
           新規登録
         </Link>
         {" · "}
-        <Link href="/reset-password" className="text-slate-900 underline">
+        <Link href="/reset-password" className="text-slate-900 dark:text-slate-100">
           パスワードを忘れた場合
         </Link>
       </p>

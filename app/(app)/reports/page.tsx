@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { categoryLabel, visibilityLabel } from "@/lib/constants";
 import { getSelectedTeamId } from "@/lib/team-selection";
-
+ 
 type ReportListRow = {
   id: string;
   title: string;
@@ -252,3 +252,4 @@ export default async function ReportsPage({
     </div>
   );
 }
+

@@ -30,15 +30,15 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="mx-auto flex min-h-full max-w-md flex-col justify-center px-4 py-16">
-      <h1 className="mb-6 text-center text-2xl font-semibold text-slate-900">
+      <h1 className="mb-6 text-center text-2xl font-semibold text-slate-900 dark:text-slate-100">
         パスワード再設定
       </h1>
-      <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-        <p className="text-sm text-slate-600">
+      <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 bg-white p-6 shadow-sm">
+        <p className="text-sm text-slate-600 dark:text-slate-400">
           登録したメールアドレスを入力してください。再設定用のリンクを送信します。
         </p>
         <div>
-          <label htmlFor="email" className="mb-1 block text-sm font-medium text-slate-700">
+          <label htmlFor="email" className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
             メールアドレス
           </label>
           <input
@@ -48,7 +48,7 @@ export default function ResetPasswordPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900"
+            className="w-full rounded border border-slate-300 px-3 py-2 text-slate-900 dark:text-slate-100 dark:border-slate-600 dark:bg-slate-700"
           />
         </div>
         {error ? (
@@ -64,13 +64,13 @@ export default function ResetPasswordPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded bg-slate-900 cursor-pointer py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+          className="w-full rounded bg-slate-900 cursor-pointer py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-60"
         >
           {loading ? "送信中…" : "メールを送信"}
         </button>
       </form>
       <p className="mt-6 text-center text-sm text-slate-600">
-        <Link href="/login" className="text-slate-900 underline">
+        <Link href="/login" className="text-slate-900 dark:text-slate-100">
           ログインへ戻る
         </Link>
       </p>
