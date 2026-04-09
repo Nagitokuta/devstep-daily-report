@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { categoryLabel, visibilityLabel } from "@/lib/constants";
 import { getSelectedTeamId } from "@/lib/team-selection";
+import ReportFilters from "@/components/reports/ReportFilters";
  
 type ReportListRow = {
   id: string;
@@ -145,53 +146,10 @@ export default async function ReportsPage({
         <div>
           <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">日報一覧</h1>
 
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-
-            <Link
-              href={`/reports${q ? `?q=${q}` : ""}`}
-              className={`rounded-full px-3 py-1 text-sm border ${
-                !category
-                  ? "bg-slate-900 text-white border-slate-900"
-                  : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-600 dark:hover:text-white"
-              }`}
-            >
-              全て
-            </Link>
-
-            <Link
-              href={`/reports?category=development${q ? `&q=${q}` : ""}`}
-              className={`rounded-full px-3 py-1 text-sm border ${
-                category === "development"
-                  ? "bg-slate-900 text-white border-slate-900"
-                  : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-600 dark:hover:text-white"
-              }`}
-            >
-              開発
-            </Link>
-
-            <Link
-              href={`/reports?category=meeting${q ? `&q=${q}` : ""}`}
-              className={`rounded-full px-3 py-1 text-sm border ${
-                category === "meeting"
-                  ? "bg-slate-900 text-white border-slate-900"
-                  : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-600 dark:hover:text-white"
-              }`}
-            >
-              会議
-            </Link>
-
-            <Link
-              href={`/reports?category=other${q ? `&q=${q}` : ""}`}
-              className={`rounded-full px-3 py-1 text-sm border ${
-                category === "other"
-                  ? "bg-slate-900 text-white border-slate-900"
-                  : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-600 dark:hover:text-white"
-              }`}
-            >
-              その他
-            </Link>
-
-          </div>
+          <ReportFilters
+            q={q}
+            category={category}
+          />
 
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
             {selectedTeamId
