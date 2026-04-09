@@ -23,53 +23,82 @@ export function ReportForm({ teamId, defaultReportDate }: ReportFormProps) {
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
+
     e.preventDefault();
-    setErrors({});
-    const parsed = reportFormSchemaWithTeamContext(teamId).safeParse({
-      title,
-      report_date: reportDate,
-      category,
-      visibility,
-      content,
-    });
-    if (!parsed.success) {
-      const next: Record<string, string> = {};
-      parsed.error.issues.forEach((issue) => {
-        const p = issue.path[0];
-        if (typeof p === "string" && !next[p]) {
-          next[p] = issue.message;
-        }
-      });
-      setErrors(next);
-      return;
-    }
-
+    if(loading) return;
     setLoading(true);
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+  
+    try{
+      setErrors({});
+  
+      const parsed = reportFormSchemaWithTeamContext(teamId).safeParse({
+        title,
+        report_date: reportDate,
+        category,
+        visibility,
+        content,
+      });
+  
+      if (!parsed.success) {
+  
+        const next: Record<string,string> = {};
+        parsed.error.issues.forEach((issue)=>{
+  
+          const p = issue.path[0];
+  
+          if(typeof p==="string" && !next[p]){
+            next[p]=issue.message;
+          }
+  
+        });
 
-    const { error } = await supabase.from("daily_reports").insert({
-      team_id: teamId,
-      user_id: user.id,
-      title: parsed.data.title.trim(),
-      report_date: parsed.data.report_date,
-      category: parsed.data.category,
-      visibility: parsed.data.visibility,
-      content: parsed.data.content,
-    });
-    setLoading(false);
-    if (error) {
-      setErrors({ form: error.message });
-      return;
+        setErrors(next);
+        setLoading(false); 
+        return;
+  
+      }
+  
+      const supabase = createClient();
+  
+      const {
+        data:{user},
+      } = await supabase.auth.getUser();
+  
+      if(!user){
+        setLoading(false);
+        return;
+      }
+  
+      const {error} = await supabase
+        .from("daily_reports")
+        .insert({
+          team_id:teamId,
+          user_id:user.id,
+          title:parsed.data.title.trim(),
+          report_date:parsed.data.report_date,
+          category:parsed.data.category,
+          visibility:parsed.data.visibility,
+          content:parsed.data.content,
+        });
+  
+      if(error){
+        setErrors({form:error.message});
+        setLoading(false);
+        return;
+      }
+  
+      router.replace("/reports");
+      router.refresh();
+  
+    }catch(err){
+      console.error(err);
+  
+      setErrors({
+        form:"予期しないエラーが発生しました"
+      });
+
+      setLoading(false);
     }
-    router.replace("/reports");
-    router.refresh();
   }
 
   return (

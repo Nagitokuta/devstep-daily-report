@@ -31,46 +31,73 @@ export function ReportEditForm({ reportId, initial }: ReportEditFormProps) {
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setErrors({});
-    const parsed = reportFormSchema.safeParse({
-      title,
-      report_date: reportDate,
-      category,
-      visibility,
-      content,
-    });
-    if (!parsed.success) {
-      const next: Record<string, string> = {};
-      parsed.error.issues.forEach((issue) => {
-        const p = issue.path[0];
-        if (typeof p === "string" && !next[p]) {
-          next[p] = issue.message;
-        }
-      });
-      setErrors(next);
-      return;
-    }
 
+    e.preventDefault();
+    if(loading) return;
     setLoading(true);
-    const supabase = createClient();
-    const { error } = await supabase
-      .from("daily_reports")
-      .update({
-        title: parsed.data.title.trim(),
-        report_date: parsed.data.report_date,
-        category: parsed.data.category,
-        visibility: parsed.data.visibility,
-        content: parsed.data.content,
-      })
-      .eq("id", reportId);
-    setLoading(false);
-    if (error) {
-      setErrors({ form: error.message });
-      return;
+  
+    try{
+  
+      setErrors({});
+  
+      const parsed = reportFormSchema.safeParse({
+        title,
+        report_date: reportDate,
+        category,
+        visibility,
+        content,
+      });
+  
+      if (!parsed.success) {
+        const next: Record<string,string> = {};
+        parsed.error.issues.forEach((issue)=>{
+  
+          const p = issue.path[0];
+
+          if(typeof p==="string" && !next[p]){
+            next[p]=issue.message;
+          }
+        });
+  
+        setErrors(next);
+        setLoading(false);
+
+        return;
+      }
+  
+      const supabase = createClient();
+  
+      const {error} = await supabase
+        .from("daily_reports")
+        .update({
+          title:parsed.data.title.trim(),
+          report_date:parsed.data.report_date,
+          category:parsed.data.category,
+          visibility:parsed.data.visibility,
+          content:parsed.data.content,
+        })
+        .eq("id",reportId);
+  
+      if(error){
+        setErrors({form:error.message});
+        setLoading(false);
+
+        return;
+      }
+  
+      router.replace(`/reports/${reportId}`);
+      router.refresh();
+  
+    }catch(err){
+      console.error(err);
+  
+      setErrors({
+        form:"予期しないエラーが発生しました"
+      });
+  
+      setLoading(false);
+  
     }
-    router.replace(`/reports/${reportId}`);
-    router.refresh();
   }
 
   return (
@@ -206,7 +233,7 @@ export function ReportEditForm({ reportId, initial }: ReportEditFormProps) {
             disabled={loading}
             className="rounded bg-slate-900 cursor-pointer px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
           >
-            {loading ? "保存中…" : "更新する"}
+            {loading ? "更新中…" : "更新する"}
           </button>
           <Link
             href={`/reports/${reportId}`}
