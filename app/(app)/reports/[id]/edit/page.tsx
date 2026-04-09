@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ReportEditForm } from "./report-edit-form";
 
@@ -21,14 +21,13 @@ export default async function EditReportPage({ params }: PageProps) {
     .from("daily_reports")
     .select("id, title, report_date, category, visibility, content, user_id")
     .eq("id", id)
+    .eq("user_id", user.id)
     .maybeSingle();
 
+  // RLS で取得できないケース（他人の日報/存在しないID）は
+  // 404 ではなく一覧へ戻して操作不能にする。
   if (error || !report) {
-    notFound();
-  }
-
-  if (report.user_id !== user.id) {
-    redirect(`/reports/${id}`);
+    redirect("/reports");
   }
 
   const visibility =
