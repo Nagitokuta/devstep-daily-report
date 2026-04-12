@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { unstable_noStore as noStore } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { categoryLabel, visibilityLabel } from "@/lib/constants";
 import { getMemberTeamsForUser, getSelectedTeamId } from "@/lib/team-selection";
@@ -57,6 +58,7 @@ export default async function ReportsPage({
 }: {
   searchParams: Promise<{ q?: string; category?: string }>;
 }) {
+  noStore();
   const supabase = await createClient();
 
   const {

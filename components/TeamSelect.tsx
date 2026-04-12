@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { setSelectedTeamId } from "@/lib/actions/team";
 import { useTeams, type TeamRow } from "@/hooks/useTeams";
 
@@ -20,16 +20,21 @@ export function TeamSelect({
     fromServer ? (initialSelectedTeamId ?? null) : undefined,
   );
   const router = useRouter();
-  const [switching, setSwitching] = useState(false);
+  const [isRefreshPending, startRefreshTransition] = useTransition();
+  const [savingCookie, setSavingCookie] = useState(false);
+
+  const busy = savingCookie || isRefreshPending;
 
   async function onTeamChange(teamId: string) {
-    setSwitching(true);
+    setSavingCookie(true);
     setSelectedTeamIdState(teamId);
     try {
       await setSelectedTeamId(teamId);
-      router.refresh();
+      startRefreshTransition(() => {
+        router.refresh();
+      });
     } finally {
-      setSwitching(false);
+      setSavingCookie(false);
     }
   }
 
@@ -56,8 +61,8 @@ export function TeamSelect({
 
           <select
             id="team-select"
-            aria-busy={switching}
-            disabled={switching}
+            aria-busy={busy}
+            disabled={busy}
             className="w-full max-w-md cursor-pointer rounded border border-slate-300 px-3 py-2 text-slate-900 disabled:cursor-wait disabled:opacity-70 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
             value={selectedTeamId ?? ""}
             onChange={(e) => void onTeamChange(e.target.value)}
@@ -68,13 +73,15 @@ export function TeamSelect({
               </option>
             ))}
           </select>
-          {switching ? (
+          {busy ? (
             <p
               className="mt-2 text-sm text-slate-600 dark:text-slate-400"
               role="status"
               aria-live="polite"
             >
-              チームを切り替えています…
+              {savingCookie
+                ? "設定を保存しています…"
+                : "日報一覧を更新しています…"}
             </p>
           ) : null}
         </div>
