@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getSelectedTeamId } from "@/lib/team-selection";
+import { getMemberTeamsForUser, getSelectedTeamId } from "@/lib/team-selection";
 import { ReportForm } from "./report-form";
 
 function todayIsoDate(): string {
@@ -21,6 +21,7 @@ export default async function NewReportPage() {
   }
 
   const teamId = await getSelectedTeamId(supabase, user.id);
+  const teams = await getMemberTeamsForUser(supabase, user.id);
 
   return (
     <div className="space-y-6">
@@ -28,9 +29,9 @@ export default async function NewReportPage() {
         <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">
           日報を作成
         </h1>
-        {teamId ? (
+        {teams.length > 0 ? (
           <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-            選択中のチームに紐づけて日報を投稿します。
+            「チーム内のみ」を選んだときは、フォーム内のプルダウンで公開先のチームを選べます。
           </p>
         ) : (
           <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
@@ -42,7 +43,11 @@ export default async function NewReportPage() {
           </p>
         )}
       </div>
-      <ReportForm teamId={teamId} defaultReportDate={todayIsoDate()} />
+      <ReportForm
+        teamId={teamId}
+        teams={teams}
+        defaultReportDate={todayIsoDate()}
+      />
     </div>
   );
 }

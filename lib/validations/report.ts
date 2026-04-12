@@ -13,15 +13,26 @@ export const reportFormSchema = z.object({
 
 export type ReportFormInput = z.infer<typeof reportFormSchema>;
 
-/** チーム未参加時は「チーム内のみ」を選べない */
-export function reportFormSchemaWithTeamContext(teamId: string | null) {
+/** 「チーム内のみ」のときは所属チームのいずれかを reportTeamId で指定する */
+export function reportFormSchemaWithTeamContext(
+  teams: { id: string }[],
+  reportTeamId: string | null,
+) {
   return reportFormSchema.superRefine((data, ctx) => {
-    if (data.visibility === "team" && !teamId) {
+    if (data.visibility !== "team") return;
+    if (teams.length === 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message:
-          "「チーム内のみ」はチームに参加し、表示中のチームを選んだ状態で投稿してください。",
+        message: "「チーム内のみ」はチームに参加してから投稿してください。",
         path: ["visibility"],
+      });
+      return;
+    }
+    if (!reportTeamId || !teams.some((t) => t.id === reportTeamId)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "紐づけるチームを選択してください。",
+        path: ["team_id"],
       });
     }
   });

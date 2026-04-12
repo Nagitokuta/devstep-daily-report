@@ -6,10 +6,10 @@ import { createClient } from "@/lib/supabase/client";
 import { FileText } from "lucide-react";
 
 const navItems = [
-  { href: "/profile", label: "プロフィール" },
-  { href: "/reports/new", label: "日報作成" },
   { href: "/reports", label: "日報一覧" },
+  { href: "/reports/new", label: "日報作成" },
   { href: "/team", label: "チーム" },
+  { href: "/profile", label: "プロフィール" },
 ];
 
 type AppSidebarProps = {

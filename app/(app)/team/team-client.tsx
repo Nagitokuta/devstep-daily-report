@@ -4,18 +4,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { setSelectedTeamId } from "@/lib/actions/team";
+import { TeamSelect } from "@/components/TeamSelect";
+import type { MemberTeamRow } from "@/lib/team-selection";
 
-type TeamRow = {
-  id: string;
-  project_name: string;
-  team_code: string;
-  members_num: number;
-};
-
-type TeamClientProps = {
-  teams: TeamRow[];
-  selectedTeamId: string | null;
-};
+type TeamRow = MemberTeamRow;
 
 function normalizeText(text: string) {
   return text
@@ -25,7 +17,13 @@ function normalizeText(text: string) {
     .replace(/\s+/g," ");
 }
 
-export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
+export function TeamClient({
+  teams,
+  selectedTeamId,
+}: {
+  teams: TeamRow[];
+  selectedTeamId: string | null;
+}) {
   const router = useRouter();
   const [createName, setCreateName] = useState("");
   const [joinCode, setJoinCode] = useState("");
@@ -34,11 +32,6 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [errorType, setErrorType] = useState<"create" | "join" | null>(null);
-
-  async function onTeamChange(teamId: string) {
-    await setSelectedTeamId(teamId);
-    router.refresh();
-  }
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -188,30 +181,10 @@ export function TeamClient({ teams, selectedTeamId }: TeamClientProps) {
     <div className="space-y-10">
       {/* 現在のチーム */}
       <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">現在のチーム</h2>
-        {teams.length === 0 ? (
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-            まだチームに参加していません。下から作成または参加コードで参加してください。
-          </p>
-        ) : (
-          <div className="mt-4">
-            <label htmlFor="team-select" className="mb-1 block text-sm text-slate-700 dark:text-slate-300">
-              表示・投稿に使うチーム
-            </label>
-            <select
-              id="team-select"
-              className="w-full max-w-md cursor-pointer rounded border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
-              value={selectedTeamId ?? ""}
-              onChange={(e) => void onTeamChange(e.target.value)}
-            >
-              {teams.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.project_name}（{t.team_code}）
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+        <TeamSelect
+          initialTeams={teams}
+          initialSelectedTeamId={selectedTeamId}
+        />
       </section>
 
       {/* 作成・参加フォーム */}

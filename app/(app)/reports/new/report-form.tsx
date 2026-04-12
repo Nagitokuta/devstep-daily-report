@@ -5,96 +5,102 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { REPORT_CATEGORIES, VISIBILITY_OPTIONS } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/client";
+import type { MemberTeamRow } from "@/lib/team-selection";
 import { reportFormSchemaWithTeamContext } from "@/lib/validations/report";
 
 type ReportFormProps = {
   teamId: string | null;
+  teams: MemberTeamRow[];
   defaultReportDate: string;
 };
 
-export function ReportForm({ teamId, defaultReportDate }: ReportFormProps) {
+export function ReportForm({
+  teamId,
+  teams,
+  defaultReportDate,
+}: ReportFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [reportDate, setReportDate] = useState(defaultReportDate);
   const [category, setCategory] = useState<string>("development");
   const [visibility, setVisibility] = useState<"team" | "global">("global");
+  const [targetTeamId, setTargetTeamId] = useState<string | null>(
+    () => teamId ?? teams[0]?.id ?? null,
+  );
   const [content, setContent] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
-
     e.preventDefault();
-    if(loading) return;
+    if (loading) return;
     setLoading(true);
-  
-    try{
+
+    try {
       setErrors({});
-  
-      const parsed = reportFormSchemaWithTeamContext(teamId).safeParse({
+
+      const parsed = reportFormSchemaWithTeamContext(
+        teams,
+        targetTeamId,
+      ).safeParse({
         title,
         report_date: reportDate,
         category,
         visibility,
         content,
       });
-  
+
       if (!parsed.success) {
-  
-        const next: Record<string,string> = {};
-        parsed.error.issues.forEach((issue)=>{
-  
+        const next: Record<string, string> = {};
+        parsed.error.issues.forEach((issue) => {
           const p = issue.path[0];
-  
-          if(typeof p==="string" && !next[p]){
-            next[p]=issue.message;
+          if (typeof p === "string" && !next[p]) {
+            next[p] = issue.message;
           }
-  
         });
 
         setErrors(next);
-        setLoading(false); 
+        setLoading(false);
         return;
-  
       }
-  
+
       const supabase = createClient();
-  
+
       const {
-        data:{user},
+        data: { user },
       } = await supabase.auth.getUser();
-  
-      if(!user){
+
+      if (!user) {
         setLoading(false);
         return;
       }
-  
-      const {error} = await supabase
-        .from("daily_reports")
-        .insert({
-          team_id:teamId,
-          user_id:user.id,
-          title:parsed.data.title.trim(),
-          report_date:parsed.data.report_date,
-          category:parsed.data.category,
-          visibility:parsed.data.visibility,
-          content:parsed.data.content,
-        });
-  
-      if(error){
-        setErrors({form:error.message});
+
+      const rowTeamId =
+        parsed.data.visibility === "team" ? targetTeamId : null;
+
+      const { error } = await supabase.from("daily_reports").insert({
+        team_id: rowTeamId,
+        user_id: user.id,
+        title: parsed.data.title.trim(),
+        report_date: parsed.data.report_date,
+        category: parsed.data.category,
+        visibility: parsed.data.visibility,
+        content: parsed.data.content,
+      });
+
+      if (error) {
+        setErrors({ form: error.message });
         setLoading(false);
         return;
       }
-  
+
       router.replace("/reports");
       router.refresh();
-  
-    }catch(err){
+    } catch (err) {
       console.error(err);
-  
+
       setErrors({
-        form:"予期しないエラーが発生しました"
+        form: "予期しないエラーが発生しました",
       });
 
       setLoading(false);
@@ -102,13 +108,15 @@ export function ReportForm({ teamId, defaultReportDate }: ReportFormProps) {
   }
 
   return (
-    <div className="
+    <div
+      className="
       rounded-xl
       bg-white dark:bg-slate-700
       border border-slate-200 dark:border-slate-600
       p-8
       shadow-sm
-    ">
+    "
+    >
       <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
         <div>
           <label
@@ -156,7 +164,10 @@ export function ReportForm({ teamId, defaultReportDate }: ReportFormProps) {
           </span>
           <div className="flex flex-wrap gap-3">
             {REPORT_CATEGORIES.map((c) => (
-              <label key={c.value} className="flex items-center gap-2 text-sm dark:text-slate-200">
+              <label
+                key={c.value}
+                className="flex items-center gap-2 text-sm dark:text-slate-200"
+              >
                 <input
                   type="radio"
                   name="category"
@@ -180,27 +191,66 @@ export function ReportForm({ teamId, defaultReportDate }: ReportFormProps) {
           </span>
           <div className="flex flex-wrap gap-3">
             {VISIBILITY_OPTIONS.map((v) => (
-              <label key={v.value} className="flex items-center gap-2 text-sm dark:text-slate-200">
+              <label
+                key={v.value}
+                className="flex items-center gap-2 text-sm dark:text-slate-200"
+              >
                 <input
                   type="radio"
                   name="visibility"
                   className="cursor-pointer"
                   value={v.value}
                   checked={visibility === v.value}
-                  onChange={() => setVisibility(v.value)}
-                  disabled={v.value === "team" && !teamId}
+                  onChange={() => {
+                    const next = v.value as "team" | "global";
+                    setVisibility(next);
+                    if (next === "team" && !targetTeamId && teams[0]) {
+                      setTargetTeamId(teams[0].id);
+                    }
+                  }}
+                  disabled={v.value === "team" && teams.length === 0}
                 />
                 {v.label}
-                {v.value === "team" && !teamId ? (
-                  <span className="text-xs text-slate-500 dark:text-slate-400">（要チーム参加）</span>
+                {v.value === "team" && teams.length === 0 ? (
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    （要チーム参加）
+                  </span>
                 ) : null}
               </label>
             ))}
           </div>
-          {!teamId ? (
+          {visibility === "team" && teams.length > 0 ? (
+            <div className="mt-4 max-w-md">
+              <label
+                htmlFor="report-team-select"
+                className="mb-1 block text-sm text-slate-700 dark:text-slate-300"
+              >
+                この日報を紐づけるチーム
+              </label>
+              <select
+                id="report-team-select"
+                value={targetTeamId ?? ""}
+                onChange={(e) => setTargetTeamId(e.target.value || null)}
+                className="w-full cursor-pointer rounded border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm dark:border-slate-600 dark:bg-slate-600 dark:text-white"
+              >
+                {teams.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.project_name}（{t.team_code}）
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                「チーム内のみ」の公開先になります（一覧の「表示中のチーム」とは別に選べます）。
+              </p>
+            </div>
+          ) : null}
+          {teams.length === 0 ? (
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
               チーム未参加のときは「全体公開」のみ保存できます。「チーム内のみ」は
-              <Link href="/team" className="underline text-slate-900 dark:text-white">
+              <Link
+                href="/team"
+                className="underline text-slate-900 dark:text-white"
+              >
                 チーム画面
               </Link>
               から参加後に選択できます。
@@ -208,6 +258,9 @@ export function ReportForm({ teamId, defaultReportDate }: ReportFormProps) {
           ) : null}
           {errors.visibility ? (
             <p className="mt-1 text-sm text-red-600">{errors.visibility}</p>
+          ) : null}
+          {errors.team_id ? (
+            <p className="mt-1 text-sm text-red-600">{errors.team_id}</p>
           ) : null}
         </div>
 

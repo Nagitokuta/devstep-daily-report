@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getSelectedTeamId } from "@/lib/team-selection";
+import { getMemberTeamsForUser, getSelectedTeamId } from "@/lib/team-selection";
 import { TeamClient } from "./team-client";
 import { TeamMembers } from "./team-members";
 
@@ -12,27 +12,7 @@ export default async function TeamPage() {
     return null;
   }
 
-  const { data: memberRows } = await supabase
-    .from("team_members")
-    .select("team_id")
-    .eq("user_id", user.id);
-
-  const teamIds = (memberRows ?? []).map((r) => r.team_id).filter(Boolean);
-  let teams: {
-    id: string;
-    project_name: string;
-    team_code: string;
-    members_num: number;
-  }[] = [];
-
-  if (teamIds.length > 0) {
-    const { data: teamRows } = await supabase
-      .from("teams")
-      .select("id, project_name, team_code, members_num")
-      .in("id", teamIds);
-    teams = (teamRows ?? []) as typeof teams;
-  }
-
+  const teams = await getMemberTeamsForUser(supabase, user.id);
   const selectedTeamId = await getSelectedTeamId(supabase, user.id);
 
   return (

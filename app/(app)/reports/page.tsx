@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { categoryLabel, visibilityLabel } from "@/lib/constants";
-import { getSelectedTeamId } from "@/lib/team-selection";
+import { getMemberTeamsForUser, getSelectedTeamId } from "@/lib/team-selection";
 import ReportFilters from "@/components/reports/ReportFilters";
+import { TeamSelect } from "@/components/TeamSelect";
  
 type ReportListRow = {
   id: string;
@@ -71,6 +72,7 @@ export default async function ReportsPage({
   const category = params.category ?? "";
 
   const selectedTeamId = await getSelectedTeamId(supabase, user.id);
+  const memberTeams = await getMemberTeamsForUser(supabase, user.id);
 
   let query = supabase
     .from("daily_reports")
@@ -165,12 +167,21 @@ export default async function ReportsPage({
 
         </div>
 
-        <Link
-          href="/reports/new"
-          className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
-        >
-          新規作成
-        </Link>
+        <div className="mt-4 flex items-end gap-3">
+          {/* チーム選択 */}
+          <TeamSelect
+            initialTeams={memberTeams}
+            initialSelectedTeamId={selectedTeamId}
+          />
+
+          {/* 新規作成ボタン */}
+          <Link
+            href="/reports/new"
+            className="h-[42px] rounded bg-slate-900 px-4 text-sm font-medium text-white hover:bg-slate-700 flex items-center"
+          >
+            新規作成
+          </Link>
+        </div>
 
       </div>
 
