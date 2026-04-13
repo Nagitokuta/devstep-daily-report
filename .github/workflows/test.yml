@@ -1,0 +1,25 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: コード取得
+        uses: actions/checkout@v4
+
+      - name: Nodeセットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 依存インストール
+        run: npm ci
+
+      - name: テスト実行
+        run: npx vitest run --coverage
