@@ -2,7 +2,7 @@ import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { categoryLabel, visibilityLabel } from "@/lib/constants";
-import { getMemberTeamsForUser, getSelectedTeamId } from "@/lib/team-selection";
+import { getTeamSelectionContext } from "@/lib/team-selection";
 import ReportFilters from "@/components/reports/ReportFilters";
 import { TeamSelect } from "@/components/TeamSelect";
  
@@ -20,6 +20,8 @@ type ReportListRow = {
     | null;
   comments: { count: number }[] | null;
 };
+
+const REPORTS_PAGE_SIZE = 50;
 
 function authorName(users: ReportListRow["users"]): string {
   if (!users) return "不明";
@@ -73,8 +75,10 @@ export default async function ReportsPage({
   const q = normalizeSearchTerm(params.q ?? "");
   const category = params.category ?? "";
 
-  const selectedTeamId = await getSelectedTeamId(supabase, user.id);
-  const memberTeams = await getMemberTeamsForUser(supabase, user.id);
+  const { selectedTeamId, memberTeams } = await getTeamSelectionContext(
+    supabase,
+    user.id,
+  );
 
   let query = supabase
     .from("daily_reports")
@@ -94,7 +98,8 @@ export default async function ReportsPage({
       comments(count)
     `
     )
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(REPORTS_PAGE_SIZE);
 
   // 公開範囲条件
   if (selectedTeamId) {
@@ -116,11 +121,12 @@ export default async function ReportsPage({
     const { data: matchedUsers } = await supabase
       .from("users")
       .select("id")
-      .ilike("name", `%${q}%`);
+      .ilike("name", `%${q}%`)
+      .limit(20);
   
     const userIds = matchedUsers?.map(u => u.id) ?? [];
   
-    let orConditions = [
+    const orConditions = [
       `title.ilike.%${q}%`,
       `content.ilike.%${q}%`
     ];
