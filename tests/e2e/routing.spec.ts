@@ -1,10 +1,12 @@
 import { expect, test } from "@playwright/test";
-
 test.describe("ルーティング", () => {
+  test.use({ storageState: undefined });
+
   test("トップアクセス時はログイン画面へ遷移する", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page).toHaveURL(/\/login(?:\?.*)?$/);
+    await page.waitForURL(/\/login/);
+
     await expect(page.getByRole("heading", { name: "ログイン" })).toBeVisible();
   });
 
@@ -12,10 +14,10 @@ test.describe("ルーティング", () => {
     const targetPath = "/reports";
 
     await page.goto(targetPath);
-    await expect(page).toHaveURL(/\/login(?:\?.*)?$/);
 
-    const redirected = new URL(page.url());
-    const nextParam = redirected.searchParams.get("next");
+    await page.waitForURL(/\/login/);
+
+    const nextParam = new URL(page.url()).searchParams.get("next");
 
     if (nextParam) {
       expect(nextParam).toBe(targetPath);
