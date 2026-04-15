@@ -3,6 +3,8 @@ import { expect, test, type Page } from "@playwright/test";
 const E2E_EMAIL = process.env.E2E_EMAIL;
 const E2E_PASSWORD = process.env.E2E_PASSWORD;
 
+console.log("email:", process.env.E2E_EMAIL);
+
 async function login(page: Page) {
   await page.goto("/login");
   await page.getByLabel("メールアドレス").fill(E2E_EMAIL!);
