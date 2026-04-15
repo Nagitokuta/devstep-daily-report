@@ -32,7 +32,7 @@ jobs:
 
       # 🔹 サーバー起動
       - name: Start server
-        run: npm run start
+        run: npm run start &
 
       # 🔹 サーバー起動待ち
       - name: Wait for server
