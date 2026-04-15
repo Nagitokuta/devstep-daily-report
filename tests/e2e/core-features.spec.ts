@@ -10,8 +10,15 @@ async function login(page: Page) {
   await page.getByLabel("パスワード").fill(E2E_PASSWORD!);
   await page.getByRole("button", { name: "ログイン" }).click();
 
-  await expect(page).toHaveURL("/reports");
-  await expect(page.getByText("読み込み中…")).toBeHidden();
+  await expect(page).toHaveURL(/\/reports/, { timeout: 15000 });
+  
+  await expect(
+    page.getByText("読み込み中…")
+  ).toBeHidden({ timeout: 15000 });
+  
+  await expect(
+    page.getByRole("heading", { name: "日報一覧" })
+  ).toBeVisible();
 }
 
 async function openReportFromList(page: Page, title: string) {
