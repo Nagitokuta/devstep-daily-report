@@ -49,7 +49,7 @@ jobs:
 
       # 🔹 Playwright準備
       - name: Install Playwright Browsers
-        run: npx playwright install chromium --with-deps=false
+        run: npx playwright install chromium
 
       # 🔹 E2Eテスト
       - name: E2E Test（Playwright）
