@@ -63,3 +63,7 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+
+env:
+  E2E_EMAIL: ${{ secrets.E2E_EMAIL }}
+  E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
