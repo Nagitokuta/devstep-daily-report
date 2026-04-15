@@ -32,11 +32,16 @@ jobs:
 
       # 🔹 サーバー起動
       - name: Start server
-        run: npm run start &
+        run: npm run start
 
       # 🔹 サーバー起動待ち
       - name: Wait for server
-        run: npx wait-on http://127.0.0.1:3000 --timeout 60000 --interval 1000
+        run: |
+          for i in {1..30}; do
+            curl -s http://127.0.0.1:3000 && exit 0
+            sleep 2
+          done
+          exit 1
 
       # 🔹 ヘルスチェック
       - name: Health check
