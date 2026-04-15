@@ -44,7 +44,7 @@ describe("reportFormSchemaWithTeamContext", () => {
     expect(result.success).toBe(true);
   });
 
-  it("CIテスト用：破壊", () => {
+  it("CIテスト用：再破壊", () => {
     expect(true).toBe(false);
   });
 });
