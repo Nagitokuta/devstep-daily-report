@@ -11,11 +11,10 @@ async function login(page: Page) {
 
   await page.getByRole("button", { name: "ログイン" }).click();
 
-  await expect(page.getByRole("button", { name: "ログイン" }))
-    .toBeHidden({ timeout: 10000 });
+  await expect(page).toHaveURL(/\/reports/);
 
   await expect(
-    page.getByRole("link", { name: "日報一覧" })
+    page.getByRole("heading", { name: "日報一覧" })
   ).toBeVisible({ timeout: 10000 });
 }
 
