@@ -2,7 +2,6 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 const publicPaths = new Set([
-  "/",
   "/login",
   "/signup",
   "/reset-password",
