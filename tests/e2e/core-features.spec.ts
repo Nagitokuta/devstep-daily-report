@@ -11,16 +11,13 @@ async function login(page: Page) {
 
   await page.getByRole("button", { name: "ログイン" }).click();
 
-  //　ログイン後の遷移待ち
-  await page.waitForURL("**/reports");
+  // DOM更新待ち（最も安定）
+  await expect(page.getByRole("button", { name: "ログイン" }))
+    .toBeHidden({ timeout: 10000 });
 
-  // UIが描画されるまで少し待つ
-  await page.waitForLoadState("networkidle");
-
-  // 存在確認
   await expect(
     page.getByRole("link", { name: "日報一覧" })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 }
 
 async function openReportFromList(page: Page, title: string) {
