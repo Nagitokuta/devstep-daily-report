@@ -3,18 +3,13 @@ import { expect, test, type Page } from "@playwright/test";
 const E2E_EMAIL = process.env.E2E_EMAIL;
 const E2E_PASSWORD = process.env.E2E_PASSWORD;
 
-console.log("email:", process.env.E2E_EMAIL);
-
 async function login(page: Page) {
   await page.goto("/login");
   await page.getByLabel("メールアドレス").fill(E2E_EMAIL!);
   await page.getByLabel("パスワード").fill(E2E_PASSWORD!);
   await page.getByRole("button", { name: "ログイン" }).click();
 
-  // ログイン成功時の到達先は環境差が出やすいので、
-  // 「/login から離脱したこと」と「保護画面の主要UI表示」で判定する。
-  await expect.poll(() => new URL(page.url()).pathname, { timeout: 20000 }).not.toBe("/login");
-  await expect(page.getByRole("link", { name: "日報一覧" })).toBeVisible({ timeout: 20000 });
+  await expect(page.getByRole("link", { name: "日報一覧" })).toBeVisible();
 }
 
 async function openReportFromList(page: Page, title: string) {
