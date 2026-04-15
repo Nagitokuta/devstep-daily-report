@@ -5,11 +5,22 @@ const E2E_PASSWORD = process.env.E2E_PASSWORD;
 
 async function login(page: Page) {
   await page.goto("/login");
+
   await page.getByLabel("メールアドレス").fill(E2E_EMAIL!);
   await page.getByLabel("パスワード").fill(E2E_PASSWORD!);
+
   await page.getByRole("button", { name: "ログイン" }).click();
 
-  await expect(page.getByRole("link", { name: "日報一覧" })).toBeVisible();
+  //　ログイン後の遷移待ち
+  await page.waitForURL("**/reports");
+
+  // UIが描画されるまで少し待つ
+  await page.waitForLoadState("networkidle");
+
+  // 存在確認
+  await expect(
+    page.getByRole("link", { name: "日報一覧" })
+  ).toBeVisible();
 }
 
 async function openReportFromList(page: Page, title: string) {
