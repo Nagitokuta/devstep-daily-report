@@ -1,8 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { useRouter } from "next/navigation";
-import LoadingOverlay from "@/components/ui/LoadingOverlay";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type Props = {
   q: string;
@@ -10,22 +9,25 @@ type Props = {
 };
 
 export default function ReportFilters({ q, category }: Props) {
-
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const [isPending, startTransition] = useTransition();
 
   const move = (url: string) => {
+    const current = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : "");
+    if (current === url) {
+      return;
+    }
+
     startTransition(() => {
-      router.push(url);
+      router.replace(url);
     });
   };
 
   return (
     <div className="mt-2 flex flex-wrap items-center gap-2">
-
-      <LoadingOverlay show={isPending} text="カテゴリを絞り込み中..." />
-
       <button
         onClick={() => move(`/reports${q ? `?q=${q}` : ""}`)}
         disabled={isPending}
@@ -73,7 +75,11 @@ export default function ReportFilters({ q, category }: Props) {
       >
         その他
       </button>
-
+      {isPending ? (
+        <p className="ml-2 text-xs text-slate-500 dark:text-slate-400" role="status">
+          絞り込み中…
+        </p>
+      ) : null}
     </div>
   );
 }

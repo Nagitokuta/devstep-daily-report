@@ -1,22 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useSearchParams } from "next/navigation";
-import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 export function AppHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
-
   const pathname = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const q = searchParams.get("q") ?? "";
+  const currentQuery = searchParams.get("q") ?? "";
+  const currentCategory = searchParams.get("category") ?? "";
 
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-
-  // ★追加
-  const [loading, setLoading] = useState(false);
+  const [query, setQuery] = useState(currentQuery);
+  const [isPending, startTransition] = useTransition();
 
   const loadAvatar = useCallback(async () => {
     const supabase = createClient();
@@ -37,12 +36,15 @@ export function AppHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
       .maybeSingle();
 
     setAvatarUrl(row?.avatar_url ?? null);
-
   }, []);
 
   useEffect(() => {
+    setQuery(currentQuery);
+  }, [currentQuery]);
+
+  useEffect(() => {
     void loadAvatar();
-  }, [loadAvatar, pathname]);
+  }, [loadAvatar]);
 
   useEffect(() => {
     const onUpdate = () => void loadAvatar();
@@ -50,8 +52,33 @@ export function AppHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
     return () => window.removeEventListener("profile-updated", onUpdate);
   }, [loadAvatar]);
 
-  return (
+  const searchUrl = useMemo(() => {
+    const params = new URLSearchParams();
+    const trimmed = query.trim();
+    if (trimmed) {
+      params.set("q", trimmed);
+    }
+    if (pathname === "/reports" && currentCategory) {
+      params.set("category", currentCategory);
+    }
+    const qs = params.toString();
+    return qs ? `/reports?${qs}` : "/reports";
+  }, [query, pathname, currentCategory]);
 
+  function handleSearchSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const current = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : "");
+    if (current === searchUrl) {
+      return;
+    }
+
+    startTransition(() => {
+      router.replace(searchUrl);
+    });
+  }
+
+  return (
     <header className="
       relative
       sticky top-0 z-30
@@ -61,13 +88,8 @@ export function AppHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
       shadow-sm dark:shadow-black/20
       transition-colors
     ">
-      
-      <LoadingOverlay show={loading} text="検索中..." />
-
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-6">
-
         <div className="flex flex-1 items-center gap-3">
-
           <button
             type="button"
             onClick={onOpenSidebar}
@@ -86,18 +108,12 @@ export function AppHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
             </svg>
           </button>
 
-          <form
-            action="/reports"
-            method="get"
-            onSubmit={() => setLoading(true)}
-            className="relative flex w-full max-w-md items-center gap-3"
-          >
-
+          <form onSubmit={handleSearchSubmit} className="relative flex w-full max-w-md items-center gap-3">
             <input
               type="search"
-              name="q"
               placeholder="検索"
-              defaultValue={q}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
               className="
                 w-full rounded-full
                 border border-slate-300 dark:border-slate-600
@@ -113,7 +129,7 @@ export function AppHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={isPending}
               className="
                 hidden whitespace-nowrap min-w-[80px]
                 rounded-xl cursor-pointer
@@ -125,14 +141,12 @@ export function AppHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
                 transition-colors
                 md:inline-flex
                 disabled:opacity-50
-                disabled:cursor-not-allowed
+                disabled:cursor-wait
               "
             >
-              検索
+              {isPending ? "検索中…" : "検索"}
             </button>
-
           </form>
-
         </div>
 
         <Link
@@ -154,9 +168,7 @@ export function AppHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
             </svg>
           )}
         </Link>
-
       </div>
-
     </header>
   );
 }
