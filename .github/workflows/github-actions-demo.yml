@@ -34,6 +34,10 @@ jobs:
       - name: Start server
         run: npm run start &
 
+      # 🔹 デバック用サーバー
+      - name: Debug server
+        run: curl -I http://localhost:3000
+
       # 🔹 サーバー起動待ち
       - name: Wait for server
         run: npx wait-on http://localhost:3000
