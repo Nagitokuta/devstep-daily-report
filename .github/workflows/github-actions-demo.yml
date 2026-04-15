@@ -34,13 +34,13 @@ jobs:
       - name: Start server
         run: npm run start &
 
-      # 🔹 デバック用サーバー
-      - name: Debug server
-        run: curl -I http://localhost:3000
-
       # 🔹 サーバー起動待ち
       - name: Wait for server
-        run: npx wait-on http://localhost:3000
+        run: npx wait-on http://127.0.0.1:3000 --timeout 60000 --interval 1000
+
+      # 🔹 ヘルスチェック
+      - name: Health check
+        run: curl -I http://127.0.0.1:3000
 
       # 🔹 Playwright準備
       - name: Install Playwright Browsers
