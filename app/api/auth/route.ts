@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 // 公開ページのパス
 const publicPaths = new Set([
-  "/",
   "/login",
   "/signup",
   "/reset-password",
