@@ -6,6 +6,13 @@ const E2E_PASSWORD = process.env.E2E_PASSWORD;
 async function login(page: Page) {
   await page.goto("/login");
 
+  console.log("EMAIL:", E2E_EMAIL);
+  console.log("PASSWORD:", E2E_PASSWORD);
+
+  if (!E2E_EMAIL || !E2E_PASSWORD) {
+    throw new Error("E2E_EMAIL / E2E_PASSWORD が未設定です");
+  }
+
   await page.getByLabel("メールアドレス").fill(E2E_EMAIL!);
   await page.getByLabel("パスワード").fill(E2E_PASSWORD!);
   await page.getByRole("button", { name: "ログイン" }).click();
