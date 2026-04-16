@@ -1,6 +1,7 @@
 // app/api/auth/route.ts
 import { createServerClient } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
+import type { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
 // 公開ページのパス
 const publicPaths = new Set([
@@ -41,7 +42,13 @@ export async function GET(req: NextRequest) {
         getAll() {
           return req.cookies.getAll();
         },
-        setAll(cookiesToSet: { name: string; value: string; options?: any }[]) {
+        setAll(
+          cookiesToSet: {
+            name: string;
+            value: string;
+            options?: Partial<ResponseCookie>;
+          }[],
+        ) {
           cookiesToSet.forEach((cookie) => {
             response.cookies.set(cookie.name, cookie.value, cookie.options);
           });

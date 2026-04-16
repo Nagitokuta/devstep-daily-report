@@ -171,8 +171,12 @@ export function TeamClient({
       // 参加モーダルを表示
       setModalMessage("チームに参加しました！🎉");
       setShowModal(true);
-    } catch (err: any) {
-      setError(err.message || "エラーが発生しました。");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("エラーが発生しました。");
+      }
       setLoading(null);
     }
   }
