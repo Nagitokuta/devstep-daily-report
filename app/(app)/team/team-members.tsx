@@ -3,6 +3,18 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
+type User = {
+  id: string;
+  name: string | null;
+  avatar_url: string | null;
+};
+
+type Row = {
+  user_id: string;
+  joined_at: string;
+  users: User | User[] | null;
+};
+
 type Member = {
   user_id: string;
   name: string;
@@ -39,16 +51,17 @@ export function TeamMembers({ teamId }: { teamId: string }) {
         console.error(error);
       } else {
         const members: Member[] =
-          rows?.map((r) => {
-            const user = r.users as any;
-            const firstUser = Array.isArray(user) ? user[0] : user;
-            return {
-              user_id: r.user_id,
-              name: firstUser?.name ?? "名無し",
-              avatar_url: firstUser?.avatar_url ?? null,
-              joined_at: r.joined_at,
-            };
-          }) ?? [];
+        (rows as Row[] | null)?.map((r) => {
+          const user = r.users;
+          const firstUser = Array.isArray(user) ? user[0] : user;
+      
+          return {
+            user_id: r.user_id,
+            name: firstUser?.name ?? "名無し",
+            avatar_url: firstUser?.avatar_url ?? null,
+            joined_at: r.joined_at,
+          };
+        }) ?? [];
         setMembers(members);
       }
       setLoading(false);
