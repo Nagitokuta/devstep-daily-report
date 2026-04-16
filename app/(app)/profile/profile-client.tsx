@@ -275,34 +275,38 @@ export function ProfileClient() {
 
             <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
 
-              <div>
-                <label className="
+            <div>
+              <label
+                htmlFor="name"
+                className="
                 mb-1 block text-sm font-medium
                 text-slate-700 dark:text-slate-300
-                ">
-                  氏名
-                </label>
+                "
+              >
+                氏名
+              </label>
 
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  maxLength={50}
-                  required
-                  className="
-                  w-full rounded
-                  border border-slate-300 dark:border-slate-600
+              <input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                maxLength={50}
+                required
+                className="
+                w-full rounded
+                border border-slate-300 dark:border-slate-600
 
-                  bg-white dark:bg-slate-900
+                bg-white dark:bg-slate-900
 
-                  px-3 py-3 sm:py-2.5
-                  text-base
+                px-3 py-3 sm:py-2.5
+                text-base
 
-                  text-slate-900 dark:text-slate-100
+                text-slate-900 dark:text-slate-100
 
-                  transition-colors
-                  "
-                />
-              </div>
+                transition-colors
+                "
+              />
+            </div>
 
 
               {error ? (
