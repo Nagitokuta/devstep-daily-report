@@ -12,9 +12,6 @@ async function login(page: Page) {
 
   await page.waitForTimeout(2000);
 
-  const body = await page.locator("body").innerText();
-  console.log(body);
-
   await expect(page).toHaveURL(/\/reports/, { timeout: 15000 });
   
   await expect(
