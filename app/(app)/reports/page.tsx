@@ -154,7 +154,7 @@ export default async function ReportsPage({
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">日報一覧</h1>
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">日報一覧aaa</h1>
 
           <ReportFilters
             q={q}
