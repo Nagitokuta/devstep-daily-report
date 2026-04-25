@@ -21,7 +21,7 @@ https://devstep-daily-report.vercel.app/
 
 ## デモ動画 
 
-[![デモ動画](./README-assets/login.png)](./README-assets/daily-report-demo.mp4)
+https://youtu.be/Fy3muoUDGW4?si=shtcckTlFXYHVgfw
 
 ---
 
